@@ -1,0 +1,80 @@
+<h1 mat-dialog-title>Dettaglio cliente </h1>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-3">
+      <h6>Nome</h6>
+    </div>
+    <div class="col-lg-9 text-right">
+      <span>{{data.name}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <h6>Codice Store Magento</h6>
+    </div>
+    <div class="col-lg-6 text-right">
+      <span>{{data.magentoStoreCode}}</span>
+    </div>
+  </div>
+  <h2>Dati magento </h2>
+  <div class="row">
+    <div class="col-lg-3">
+      <h6>Url sito</h6>
+    </div>
+    <div class="col-lg-9 text-right">
+      <span>{{data.magento.baseUrl}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-3">
+      <h6>Api token</h6>
+    </div>
+    <div class="col-lg-9 text-right">
+      <span>{{data.magento.token}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-3">
+      <h6>Ftp Host</h6>
+    </div>
+    <div class="col-lg-9 text-right">
+      <span>{{data.magento.ftpHost}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-3">
+      <h6>Ftp User</h6>
+    </div>
+    <div class="col-lg-9 text-right">
+      <span>{{data.magento.ftpUser}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <h6>Ftp Password</h6>
+    </div>
+    <div class="col-lg-8 text-right">
+      <span>{{data.magento.ftpPassword}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <h6>Ftp Import Path</h6>
+    </div>
+    <div class="col-lg-8 text-right">
+      <span>{{data.magento.ftpImportPath}}</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <h6>Magento Root Path</h6>
+    </div>
+    <div class="col-lg-8 text-right">
+      <span>{{data.magento.magentoRootPath}}</span>
+    </div>
+  </div>
+</div>
+ <mat-dialog-actions>
+  <button mat-button (click)="onCancel()" class="btn cancel-button">Chiudi</button>
+  <button mat-button (click)="onUpdate()" class="btn confirm-button">Modifica</button>
+</mat-dialog-actions>

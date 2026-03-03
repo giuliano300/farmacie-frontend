@@ -1,0 +1,133 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li aria-current="page" class="breadcrumb-item active">{{title}}</li>
+  </ol>
+</nav>
+
+<form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+  <mat-card class="trinta-card mb-10 bg-white border-none d-block">
+    <mat-card-content>
+      <div class="row g-3"> 
+        <div class="col-md-12">
+            <h3>Dati aziendali</h3>
+        </div>
+
+        <!-- Ragione sociale -->
+        <div class="col-sm-6">
+          <label class="label d-block fw-medium mb-10"> Nome </label>
+          <mat-form-field class="w-100">
+            <i-feather name="home"></i-feather>
+            <mat-label>Nome</mat-label>
+            <input matInput formControlName="name" type="text">
+          </mat-form-field>
+        </div>
+
+        <!-- Partita IVA -->
+        <div class="col-sm-6">
+          <label class="label d-block fw-medium mb-10">Codice store magento</label>
+          <mat-form-field class="w-100">
+            <i-feather name="code"></i-feather>
+            <mat-label>Codice store magento</mat-label>
+            <input matInput formControlName="magentoStoreCode" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-6 mb-10">
+          <label class="label d-block fw-medium mb-10">Attivo</label>
+          <mat-form-field class="w-100">
+            <i-feather name="activity"></i-feather>
+            <mat-label>Attivo</mat-label>
+            <mat-select formControlName="active">
+              <mat-option [value]="true">Attivo</mat-option>
+              <mat-option [value]="false">Disattivo</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+        <div class="col-md-12">
+            <h3>Dati magento</h3>
+        </div>
+
+        <!-- Indirizzo e CAP -->
+        <div class="col-sm-6">
+          <label class="label d-block fw-medium mb-10">Url sito</label>
+          <mat-form-field class="w-100">
+            <i-feather name="link-2"></i-feather>
+            <mat-label>Url</mat-label>
+            <input matInput formControlName="baseUrl" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-6">
+          <label class="label d-block fw-medium mb-10">Api token</label>
+          <mat-form-field class="w-100">
+            <i-feather name="code"></i-feather>
+            <mat-label>Api token</mat-label>
+            <input matInput formControlName="token" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-4">
+          <label class="label d-block fw-medium mb-10">Ftp host</label>
+          <mat-form-field class="w-100">
+            <i-feather name="link"></i-feather>
+            <mat-label>Ftp host</mat-label>
+            <input matInput formControlName="ftpHost" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-4">
+          <label class="label d-block fw-medium mb-10">Ftp user</label>
+          <mat-form-field class="w-100">
+            <i-feather name="user"></i-feather>
+            <mat-label>Ftp user</mat-label>
+            <input matInput formControlName="ftpUser" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-4">
+          <label class="label d-block fw-medium mb-10">Ftp password</label>
+          <mat-form-field class="w-100">
+            <i-feather name="lock"></i-feather>
+            <mat-label>Ftp password</mat-label>
+            <input matInput formControlName="ftpPassword" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-6">
+          <label class="label d-block fw-medium mb-10">Ftp import path</label>
+          <mat-form-field class="w-100">
+            <i-feather name="list"></i-feather>
+            <mat-label>Ftp import path</mat-label>
+            <input matInput formControlName="ftpImportPath" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-6">
+          <label class="label d-block fw-medium mb-10">Magento root path</label>
+          <mat-form-field class="w-100">
+            <i-feather name="list"></i-feather>
+            <mat-label>Magento root path</mat-label>
+            <input matInput formControlName="magentoRootPath" type="text">
+          </mat-form-field>
+        </div>
+
+        <!-- Pulsanti -->
+        <div class="col-sm-6 mt-10 text-start">
+            <button mat-flat-button class="back" type="button" (click)="returnBack()">
+                Indietro
+            </button>
+        </div>
+        <div class="col-sm-6 mt-10 text-end">
+            <button mat-flat-button color="primary" type="submit">
+                Salva
+            </button>
+        </div>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <input formControlName="id" type="hidden" value="">
+</form>
