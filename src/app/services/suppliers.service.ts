@@ -33,4 +33,8 @@ export class SuppliersService {
       return this.http.put<boolean>(this.apiUrl + "/" + c.id, c);
     }
 
+    sync(c: suppliers):Observable<boolean>{
+      return this.http.get<boolean>(this.apiUrl + "/sync?code=" + c.code);
+    }
+
 }

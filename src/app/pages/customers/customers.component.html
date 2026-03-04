@@ -19,7 +19,7 @@
                         <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Id">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                    {{element.id}}
+                                    {{element.customer.id}}
                                 </h6>
                             </div>
                         </td>
@@ -31,7 +31,7 @@
                         <td mat-cell *matCellDef="let element" class="pl-0" data-label="Nome">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                    {{element.name}}
+                                    {{element.customer.name}}
                                 </h6>
                             </div>
                         </td>
@@ -43,7 +43,7 @@
                         <td mat-cell *matCellDef="let element" class="pl-0" data-label="Codice Store Magento">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                   {{ element.magentoStoreCode }}
+                                   {{ element.customer.magentoStoreCode }}
                                 </h6>
                             </div>
                         </td>
@@ -55,7 +55,65 @@
                         <td mat-cell *matCellDef="let element" class="pl-0" data-label="Attivo">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                   {{ element.active ? "SI": "NO" }}
+                                   {{ element.customer.active ? "SI": "NO" }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="import">
+
+                        <th mat-header-cell *matHeaderCellDef class="text-center">
+                            Import
+                        </th>
+
+                        <td mat-cell *matCellDef="let element" class="text-center">
+
+                        <div class="import-status">
+
+                            <!-- stato running -->
+                            <span *ngIf="element.stepStatus === 1" class="running-label">
+                                 <span class="traffic-light"></span>
+                                in corso
+                            </span>
+
+                            <button *ngIf="element.stepStatus == null"
+                                    mat-flat-button
+                                    color="primary"
+                                    (click)="import(element.customer.id)">
+                                <i class="fa-solid fa-plus"></i>
+                                Crea nuovo
+                            </button>
+
+                            <!-- riavvia -->
+                            <button *ngIf="element.stepStatus === 3"
+                                    mat-flat-button
+                                    color="primary"
+                                    (click)="restart(element)">
+                                <i class="fa-solid fa-rotate"></i>
+                                Riavvia
+                            </button>
+
+                            <!-- avvia -->
+                            <button *ngIf="element.stepStatus === 0"
+                                    mat-flat-button
+                                    color="primary"
+                                    (click)="start(element)">
+                                <i class="fa-solid fa-play"></i>
+                                Avvia
+                            </button>
+
+                        </div>
+
+                        </td>
+                    </ng-container>                    
+                    <ng-container matColumnDef="currentStep">
+                        <th mat-header-cell *matHeaderCellDef class="text-center pl-0 mini">
+                            Step corrente
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="text-center pl-0 mini" data-label="Step corrente">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                   {{ element.currentStep ?? 'Nessuno step in corso' }}
                                 </h6>
                             </div>
                         </td>
@@ -66,13 +124,13 @@
                         </th>
                         <td mat-cell *matCellDef="let element" class="text-center pr-0" data-label="Azioni">
                             <div class="action">
-                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="dettagli" matTooltipPosition="above" (click)="openDetails(element)">
+                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="dettagli" matTooltipPosition="above" (click)="openDetails(element.customer)">
                                     <i class="{{element.action.details}}"></i>
                                 </button>
-                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="modifica" matTooltipPosition="above" (click)="updateCustomer(element.id)">
+                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="modifica" matTooltipPosition="above" (click)="updateCustomer(element.customer.id)">
                                     <i class="{{element.action.update}}"></i>
                                 </button>
-                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="elimina" matTooltipPosition="above" (click)="DeleteItem(element)">
+                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="elimina" matTooltipPosition="above" (click)="DeleteItem(element.customer)">
                                     <i class="{{element.action.delete}}"></i>
                                 </button>
                             </div>

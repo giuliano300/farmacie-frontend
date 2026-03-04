@@ -14,20 +14,30 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatTooltip } from "@angular/material/tooltip";
 import { DetailCustomerDialogComponent } from '../../detail-customer-dialog/detail-customer-dialog.component';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { customerWithBatchStatus } from '../../interfaces/customerWithBatchStatus';
+import { CommonModule } from '@angular/common';
+import { BatchesService } from '../../services/batches.service';
+import { StepService } from '../../services/step.service';
+import { runStepRequest } from '../../interfaces/runStepRequest';
 
 @Component({
     selector: 'app-customers',
-    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip],
+    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule],
     templateUrl: './customers.component.html',
     styleUrl: './customers.component.scss'
 })
 export class CustomersComponent {
 
-    customers: customers[] = []; 
-    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'action'];
-    dataSource = new MatTableDataSource<customers>(this.customers);
+    customers: customerWithBatchStatus[] = []; 
+    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'import', 'currentStep', 'action'];
+    dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
 
-    constructor(private dialog: MatDialog, private customersService: CustomersService, private router: Router) {}
+    constructor(
+      private dialog: MatDialog, 
+      private customersService: CustomersService, 
+      private batchesService: BatchesService, 
+      private stepService: StepService, 
+      private router: Router) {}
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -40,12 +50,15 @@ export class CustomersComponent {
     ngOnInit(): void {
         this.getCustomers();
     }
+    
 
     getCustomers(){
-        this.customersService.getCustomers().subscribe((data: customers[]) => {
+        this.customersService.getCustomers().subscribe((data: customerWithBatchStatus[]) => {
             // Aggiungi la proprietà action a ogni categoria esistente
+            //console.log(data);
             this.customers = data.map(customer => ({
                 ...customer, 
+                import: 'ri-restart-line',
                 action: {
                     details: 'ri-search-line',
                     update: 'ri-pencil-line',
@@ -54,9 +67,43 @@ export class CustomersComponent {
             }));
 
             //console.log(JSON.stringify(this.customers));
-            this.dataSource = new MatTableDataSource<customers>(this.customers);
+            this.dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
             this.dataSource.paginator = this.paginator;
         });
+    }
+
+   import(id: string){
+      this.batchesService.create(id).subscribe((data: any)=>{
+        if(data.batchId){
+          const req: runStepRequest = {
+            batchId: data.batchId,
+            step: "HeronImport"
+          };
+          this.stepService.run(req).subscribe((res)=>{
+            this.getCustomers();
+          })
+        }
+      })
+   }
+
+   restart(customer: customerWithBatchStatus){
+    const req:runStepRequest = {
+      batchId: customer.runningBatchId!,
+      step: customer.currentStep ?? "HeronImport"
+    };
+    this.stepService.retry(req).subscribe((res)=>{
+      this.getCustomers();
+    })
+   }
+
+   start(customer: customerWithBatchStatus){
+    const req:runStepRequest = {
+      batchId: customer.runningBatchId!,
+      step: customer.currentStep ?? "HeronImport"
+    };
+    this.stepService.run(req).subscribe((res)=>{
+      this.getCustomers();
+    })
    }
 
    openDetails(customer: any){

@@ -67,7 +67,7 @@
                         <td mat-cell *matCellDef="let element" class="text-center pl-0 mini" data-label="Ultimo aggiornamento">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                   {{ element.lastUpdate ?? 'Nessun aggiornamento' }}
+                                   {{ element.lastUpdate ? (element.lastUpdate | date:'dd/MM/yyyy HH:mm') : 'Nessun aggiornamento' }}
                                 </h6>
                             </div>
                         </td>
@@ -78,8 +78,8 @@
                         </th>
                         <td mat-cell *matCellDef="let element" class="text-center pr-0 mini2" data-label="Sincronizza">
                             <div class="action">
-                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="modifica" matTooltipPosition="above" (click)="updateSupplier(element.id)">
-                                    <i class="{{element.sincro}}"></i>
+                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="Sincronizza" matTooltipPosition="above" (click)="sync(element)">
+                                    <i class="fa-solid fa-rotate"  [class.fa-spin]="element.loading"></i>
                                 </button>
                             </div>
                         </td>

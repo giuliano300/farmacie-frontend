@@ -13,10 +13,11 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatTooltip } from "@angular/material/tooltip";
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { SuppliersService } from '../../services/suppliers.service';
+import { CommonModule, DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-suppliers',
-    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip],
+    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, DatePipe, CommonModule],
     templateUrl: './suppliers.component.html',
     styleUrl: './suppliers.component.scss'
 })
@@ -60,6 +61,14 @@ export class SuppliersComponent {
     
    updateSupplier(id:string){
     this.router.navigate(['/suppliers/add', id]);
+  }
+    
+  sync(supplier:any){
+    supplier.loading = true;
+    this.suppliersService.sync(supplier).subscribe((data)=>{
+      this.getSuppliers();
+      supplier.loading = false;
+    })
   }
     
   DeleteItem(item:suppliers){

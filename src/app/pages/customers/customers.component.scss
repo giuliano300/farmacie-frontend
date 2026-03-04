@@ -476,3 +476,31 @@
     }
 }
 
+.fa-rotate{
+    font-size: 14px;
+}
+
+
+.import-status {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.traffic-light {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #f1c40f;
+}
+
+.status-text {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.running-label {
+  font-size: 13px;
+  color: #f1c40f;
+  font-weight: 500;
+}

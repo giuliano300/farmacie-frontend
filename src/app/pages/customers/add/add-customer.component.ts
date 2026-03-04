@@ -14,6 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CustomersService } from '../../../services/customers.service';
 import { customers } from '../../../interfaces/customer';
+import { customerWithBatchStatus } from '../../../interfaces/customerWithBatchStatus';
 
 
 @Component({
@@ -88,18 +89,18 @@ export class AddCustomerComponent {
         this.title = "Aggiorna cliente";
 
         this.customerService.getCustomer(this.id)
-          .subscribe((data: customers) => {
+          .subscribe((data: customerWithBatchStatus) => {
             this.customerForm.patchValue({
-              name: data.name,
-              magentoStoreCode: data.magentoStoreCode,
-              baseUrl: data.magento.baseUrl,
-              token: data.magento.token,
-              ftpHost: data.magento.ftpHost,
-              ftpUser: data.magento.ftpUser,
-              ftpPassword: data.magento.ftpPassword,
-              ftpImportPath: data.magento.ftpImportPath,
-              magentoRootPath: data.magento.magentoRootPath,
-              active: data.active,
+              name: data.customer.name,
+              magentoStoreCode: data.customer.magentoStoreCode,
+              baseUrl: data.customer.magento.baseUrl,
+              token: data.customer.magento.token,
+              ftpHost: data.customer.magento.ftpHost,
+              ftpUser: data.customer.magento.ftpUser,
+              ftpPassword: data.customer.magento.ftpPassword,
+              ftpImportPath: data.customer.magento.ftpImportPath,
+              magentoRootPath: data.customer.magento.magentoRootPath,
+              active: data.customer.active,
               id: this.id,
             });
           });

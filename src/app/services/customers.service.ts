@@ -3,6 +3,7 @@ import { API_URL } from '../../main';
 import { HttpClient } from '@angular/common/http';
 import { customers } from '../interfaces/customer';
 import { Observable } from 'rxjs';
+import { customerWithBatchStatus } from '../interfaces/customerWithBatchStatus';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,12 @@ export class CustomersService {
     
     constructor(private http: HttpClient) {}
 
-     getCustomer(id?: string): Observable<customers> {
-      return this.http.get<customers>(this.apiUrl + "/" + id);
+     getCustomer(id?: string): Observable<customerWithBatchStatus> {
+      return this.http.get<customerWithBatchStatus>(this.apiUrl + "/" + id);
     }
 
-    getCustomers(): Observable<customers[]> {
-      return this.http.get<customers[]>(this.apiUrl);
+    getCustomers(): Observable<customerWithBatchStatus[]> {
+      return this.http.get<customerWithBatchStatus[]>(this.apiUrl);
     }
 
     delete(id: string):Observable<boolean>{
