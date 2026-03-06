@@ -1,44 +1,90 @@
-<!-- Stats -->
-<app-stats />
+<mat-accordion>
 
-<div class="row">
-    <div class="col-xxxl-6 col-md-12">
+  <mat-expansion-panel *ngFor="let group of groupedBatches"
+  [expanded]="openedCustomers.has(group.customerId)"
+  (opened)="openedCustomers.add(group.customerId)"
+  (closed)="openedCustomers.delete(group.customerId)">
 
-        <!-- Issues Summary -->
-        <app-issues-summary />
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{group.customerId}}
+      </mat-panel-title>
+
+      <mat-panel-description>
+        {{group.batches.length}} batch
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <!-- batch list -->
+
+    <div *ngFor="let batch of group.batches" class="batch-row"
+         (click)="toggle(batch)">
+
+      <div class="batch-header">
+
+        <span class="batch-id">
+          Batch {{batch.sequenceNumber}}
+        </span>
+
+        <span class="status"
+              [ngClass]="{
+                running: batch.status === 'Running',
+                completed: batch.status === 'Completed'
+              }">
+
+          {{batch.status}}
+
+        </span>
+
+      </div>
+
+      <!-- dettaglio step -->
+
+      <div *ngIf="isOpen(batch)" class="batch-details">
+
+        <div class="step">
+          <span>HeronImport</span>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="batch.heronImport.progress">
+          </mat-progress-bar>
+        </div>
+
+        <div class="step">
+          <span>Farmadati</span>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="batch.farmadati.progress">
+          </mat-progress-bar>
+        </div>
+
+        <div class="step">
+          <span>Suppliers</span>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="batch.suppliers.progress">
+          </mat-progress-bar>
+        </div>
+
+        <div class="step">
+          <span>Magento</span>
+
+          <mat-progress-bar
+            mode="determinate"
+            [value]="batch.magento.progress">
+          </mat-progress-bar>
+
+          <small>
+            {{batch.magento.success}} / {{batch.magento.total}}
+            • errori {{batch.magento.errors}}
+          </small>
+
+        </div>
+
+      </div>
 
     </div>
-    <div class="col-xxxl-6 col-md-12">
 
-        <!-- Customer Satisfaction -->
-        <app-customer-satisfaction />
-        
-    </div>
-    <div class="col-xxxl-12 col-md-12">
+  </mat-expansion-panel>
 
-        <!-- Tickets Status -->
-        <app-tickets-status />
-
-    </div>
-    <div class="col-xxxl-4 col-lg-6 col-md-12">
-
-        <!-- Avg. Response Time -->
-        <app-average-response-time />
-        
-    </div>
-    <div class="col-xxxl-4 col-lg-6 col-md-12">
-        
-        <!-- Support Status -->
-        <app-support-status />
-
-    </div>
-    <div class="col-xxxl-4 col-md-12">
-
-        <!-- Live Calls -->
-        <app-live-calls />
-        
-    </div>
-</div>
-
-<!-- Agents List -->
-<app-agents-list />
+</mat-accordion>

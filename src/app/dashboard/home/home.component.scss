@@ -1,0 +1,70 @@
+.dashboard {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.batch-card {
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.batch-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.step {
+  margin-top: 10px;
+}
+
+.step span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.step small {
+  font-size: 11px;
+  color: #777;
+}
+
+.completed {
+  opacity: 0.7;
+}
+
+.completed-label {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.batch-row {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.batch-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.batch-id {
+  font-weight: 600;
+}
+
+.status.running {
+  color: orange;
+}
+
+.status.completed {
+  color: green;
+}
+
+.batch-details {
+  margin-top: 10px;
+}
+
+.step {
+  margin-top: 8px;
+}
