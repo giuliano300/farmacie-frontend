@@ -1,49 +1,60 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
-import { DashboardResponse } from '../../interfaces/dashboard';
+import { BatchDashboardItem, DashboardResponse } from '../../interfaces/dashboard';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { interval } from 'rxjs';
-import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelDescription, MatExpansionPanelTitle } from "@angular/material/expansion";
+import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { StepService } from '../../services/step.service';
+import { runStepRequest } from '../../interfaces/runStepRequest';
+import { AlertDialogComponent } from '../../alert-dialog/alert-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-home',
     imports: [
+    MatButtonModule, 
+    MatSlideToggleModule, 
+    MatMenuModule, 
+    MatPaginatorModule, 
+    MatTableModule, 
+    MatCheckboxModule, 
+    MatFormFieldModule, 
     CommonModule,
     MatProgressBarModule,
-    MatCardModule,
-    MatAccordion,
-    MatExpansionPanel,
-    MatExpansionPanelHeader,
-    MatExpansionPanelDescription,
-    MatExpansionPanelTitle
+    MatCardModule
 ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
 })
 export class HomeComponent {
 
-    constructor(private dashboardService: DashboardService, private router: Router) {}
-    groupedBatches: any[] = [];
-    openedCustomers = new Set<string>();
-    openedBatches = new Set<string>();
+    constructor(private dashboardService: DashboardService, 
+        private router: Router, 
+        private stepService: StepService,      
+        private dialog: MatDialog
+    ) {}
+    dashobardItem: BatchDashboardItem[] = [];
+    displayedColumns: string[] = ['name', 'sequenceNumber', 'currentStep', 'stepStatus', 'heronImport.progress','farmadati.progress','suppliers.progress','magento.progress'];
+    dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
 
-    dashboard?: DashboardResponse;
+    steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
+
+    @ViewChild(MatPaginator) paginator!: MatPaginator;
 
     ngOnInit() {
         this.load();
-        interval(5000).subscribe(() => {
+        interval(2500).subscribe(() => {
             this.load();
         });
-    }
-
-    toggleBatch(batch:any) {
-        if(this.openedBatches.has(batch.batchId))
-            this.openedBatches.delete(batch.batchId);
-        else
-            this.openedBatches.add(batch.batchId);
     }
 
     load() {
@@ -54,39 +65,96 @@ export class HomeComponent {
             ...x.completedBatches
             ];
 
-            const map: any = {};
 
-            for (let batch of all) {
+            this.dashobardItem = all.map(dashobardItem => ({
+                ...dashobardItem, 
+                
+            }));
 
-            if (!map[batch.customerId]) {
-                map[batch.customerId] = {
-                customerId: batch.customerId,
-                batches: []
-                };
-            }
-
-            map[batch.customerId].batches.push(batch);
-            }
-
-            this.groupedBatches = Object.values(map);
+            //console.log(JSON.stringify(this.customers));
+            this.dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
+            this.dataSource.paginator = this.paginator;
         });
     }
 
-    toggle(batch: any) {
-        const id = batch.batchId;
+    getColor(progress: number): 'primary' | 'accent' | 'warn' {
 
-        if (this.openedBatches.has(id)) {
-            this.openedBatches.delete(id);
-        } else {
-            this.openedBatches.add(id);
+        if (progress < 40) {
+            return 'warn';       // rosso
+        }
+
+        if (progress < 80) {
+            return 'accent';     // arancione
+        }
+
+        return 'primary';      // blue
+    }
+
+    restart(currentStep: string, row: any){
+
+        row.currentStep = currentStep;
+        row.stepStatus = 1;
+
+        const index = this.steps.indexOf(currentStep);
+
+        // azzera progress step cliccato e successivi
+        for (let i = index; i < this.steps.length; i++) {
+
+            const s = this.steps[i];
+
+            const key = s.charAt(0).toLowerCase() + s.slice(1);
+
+            if (row[key])
+                row[key].progress = 0;
+        }
+
+
+        const req:runStepRequest = {
+            batchId: row.batchId,
+            step: currentStep ?? "HeronImport"
+        };
+        this.stepService.retry(req).subscribe((res)=>{
+            this.load();
+        });
+
+        if(currentStep == "Magento")
+          this.dialog.open(AlertDialogComponent, {
+            width: '500px',
+            data: 
+            { 
+                title: "Attenzione", 
+                description: "L' importazione dei prodotti su magento richiede un tempo di sincronizzazione dei prodotti di almeno 10 minuti. Dopo questo tempo inizierà l'import reale sul portale web."
+            }
+          });
+    }
+
+    getStatus(status:number){
+        switch(status){
+            case 0: 
+                return 'pending';
+            case 1:
+                return 'in corso';
+            case 2:
+                return 'terminato';
+            case 3:
+                return 'in errore';
+            default:
+                return 'pending';
         }
     }
 
-    isOpen(batch: any) {
-        return this.openedBatches.has(batch.batchId);
-    }
-
-    trackBatch(index: number, batch: any) {
-        return batch.batchId;
+    getName(stepName: string){
+        switch(stepName){
+            case "HeronImport": 
+                return "Import file heron";
+            case "Farmadati": 
+                return "Arricchimento da farmadati";
+            case "Suppliers": 
+                return "Sincro con prezzi fornitori";
+            case "Magento": 
+                return "Upload su store Magento";
+            default:
+                return "Step sconosciuto";
+        }
     }
 }

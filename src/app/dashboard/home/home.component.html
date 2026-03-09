@@ -1,90 +1,151 @@
-<mat-accordion>
+<nav aria-label="breadcrumb" class="position-relative">
+    <ol class="breadcrumb">
+        <li aria-current="page" class="breadcrumb-item active">Batch giornalieri</li>
+    </ol>
+</nav>
+<mat-card
+    class="trinta-card to-do-list-card mb-25 bg-white border-none d-block"
+>
+    <mat-card-content>
+        <div class="to-do-list-table">
+            <div class="table-responsive">
+                <table mat-table [dataSource]="dataSource">
 
-  <mat-expansion-panel *ngFor="let group of groupedBatches"
-  [expanded]="openedCustomers.has(group.customerId)"
-  (opened)="openedCustomers.add(group.customerId)"
-  (closed)="openedCustomers.delete(group.customerId)">
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Cliente
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Nome">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{element.customer.name}}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="sequenceNumber">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini4">
+                            N°
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini4" data-label="N°">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{element.sequenceNumber}}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="currentStep">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0">
+                            Step corrente
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Step corrente">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{getName(element.currentStep)}}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="stepStatus">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini2">
+                            Stato
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini2" data-label="Stato">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{getStatus(element.stepStatus)}}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="heronImport.progress">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Heron
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Heron">
+                             <div class="progress-container">
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.heronImport.progress"
+                                    [color]="getColor(element.heronImport.progress)">
+                                </mat-progress-bar>
 
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        {{group.customerId}}
-      </mat-panel-title>
+                                <span class="progress-text">
+                                    {{element.heronImport.progress}}%
+                                    - <span class="restart" (click)="restart('HeronImport', element)">Avvia/Riavvia step</span>
+                                </span>
+                            </div>
+                        </td>
+                    </ng-container>
 
-      <mat-panel-description>
-        {{group.batches.length}} batch
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+                    <ng-container matColumnDef="farmadati.progress">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Farmadati
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Farmadati">
+                             <div class="progress-container">
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.farmadati.progress"
+                                    [color]="getColor(element.farmadati.progress)">
+                                </mat-progress-bar>
 
-    <!-- batch list -->
+                                <span class="progress-text">
+                                    {{element.farmadati.progress}}%
+                                    - <span class="restart" (click)="restart('Farmadati', element)">Avvia/Riavvia step</span>
+                                </span>
+                            </div>
+                        </td>
+                    </ng-container>
 
-    <div *ngFor="let batch of group.batches" class="batch-row"
-         (click)="toggle(batch)">
+                    <ng-container matColumnDef="suppliers.progress">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Fornitori
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Fornitori">
+                             <div class="progress-container">
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.suppliers.progress"
+                                    [color]="getColor(element.suppliers.progress)">
+                                </mat-progress-bar>
 
-      <div class="batch-header">
+                                <span class="progress-text">
+                                    {{element.suppliers.progress}}%
+                                    - <span class="restart" (click)="restart('Suppliers', element)">Avvia/Riavvia step</span>
+                                </span>
+                            </div>
+                        </td>
+                    </ng-container>
 
-        <span class="batch-id">
-          Batch {{batch.sequenceNumber}}
-        </span>
+                    <ng-container matColumnDef="magento.progress">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Magento
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Magento">
+                             <div class="progress-container">
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.magento.progress"
+                                    [color]="getColor(element.magento.progress)">
+                                </mat-progress-bar>
 
-        <span class="status"
-              [ngClass]="{
-                running: batch.status === 'Running',
-                completed: batch.status === 'Completed'
-              }">
+                                <span class="progress-text">
+                                    {{element.magento.progress}}%
+                                    - <span class="restart" (click)="restart('Magento', element)">Avvia/Riavvia step</span>
+                                </span>
+                            </div>
+                        </td>
+                    </ng-container>
 
-          {{batch.status}}
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-        </span>
-
-      </div>
-
-      <!-- dettaglio step -->
-
-      <div *ngIf="isOpen(batch)" class="batch-details">
-
-        <div class="step">
-          <span>HeronImport</span>
-          <mat-progress-bar
-            mode="determinate"
-            [value]="batch.heronImport.progress">
-          </mat-progress-bar>
+                </table>
+            </div>
+            <mat-paginator [pageSizeOptions]="[20, 50, 100]"></mat-paginator>
         </div>
-
-        <div class="step">
-          <span>Farmadati</span>
-          <mat-progress-bar
-            mode="determinate"
-            [value]="batch.farmadati.progress">
-          </mat-progress-bar>
-        </div>
-
-        <div class="step">
-          <span>Suppliers</span>
-          <mat-progress-bar
-            mode="determinate"
-            [value]="batch.suppliers.progress">
-          </mat-progress-bar>
-        </div>
-
-        <div class="step">
-          <span>Magento</span>
-
-          <mat-progress-bar
-            mode="determinate"
-            [value]="batch.magento.progress">
-          </mat-progress-bar>
-
-          <small>
-            {{batch.magento.success}} / {{batch.magento.total}}
-            • errori {{batch.magento.errors}}
-          </small>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </mat-expansion-panel>
-
-</mat-accordion>
+    </mat-card-content>
+</mat-card>

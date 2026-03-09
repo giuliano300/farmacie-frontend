@@ -7,6 +7,8 @@ import { CustomersComponent } from './pages/customers/customers.component';
 import { AddCustomerComponent } from './pages/customers/add/add-customer.component';
 import { SuppliersComponent } from './pages/suppliers/suppliers.component';
 import { AddSupplierComponent } from './pages/suppliers/add/add-supplier.component';
+import { ProducersComponent } from './pages/customers/producer/producers.component';
+import { CategoriesComponent } from './pages/customers/categories/categories.component';
 
 export const routes: Routes = [
     { path: '', redirectTo : '/authentication', pathMatch: 'full' },
@@ -24,5 +26,7 @@ export const routes: Routes = [
     {path: 'suppliers/add', component: AddSupplierComponent},
     {path: 'suppliers/add/:id', component: AddSupplierComponent},
     {path: 'suppliers', component: SuppliersComponent},
+    {path: 'customer/categories/:id', component: CategoriesComponent},
+    {path: 'customer/producers/:id', component: ProducersComponent},
     { path: '**', component:NotFoundComponent}
 ];

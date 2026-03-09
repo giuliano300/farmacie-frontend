@@ -29,7 +29,7 @@ import { runStepRequest } from '../../interfaces/runStepRequest';
 export class CustomersComponent {
 
     customers: customerWithBatchStatus[] = []; 
-    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'import', 'currentStep', 'action'];
+    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'categories', 'suppliers', 'create', 'action'];
     dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
 
     constructor(
@@ -58,7 +58,9 @@ export class CustomersComponent {
             //console.log(data);
             this.customers = data.map(customer => ({
                 ...customer, 
-                import: 'ri-restart-line',
+                create:'ri-play-fill',
+                categories: 'ri-search-line',
+                suppliers: 'ri-search-line',
                 action: {
                     details: 'ri-search-line',
                     update: 'ri-pencil-line',
@@ -72,7 +74,24 @@ export class CustomersComponent {
         });
     }
 
-   import(id: string){
+    getToCategories(id:string){
+       this.router.navigate(['/customer/categories', id]);
+    }
+
+    getToProducers(id:string){
+       this.router.navigate(['/customer/producers', id]);
+    }
+
+   openDetails(customer: any){
+    const dialogRef = this.dialog.open(DetailCustomerDialogComponent, {
+      data: customer,
+      width: '80vw',
+      maxWidth: '1000px'
+    });
+
+  }
+
+  createBatch(id: string){
       this.batchesService.create(id).subscribe((data: any)=>{
         if(data.batchId){
           const req: runStepRequest = {
@@ -86,35 +105,12 @@ export class CustomersComponent {
       })
    }
 
-   restart(customer: customerWithBatchStatus){
-    const req:runStepRequest = {
-      batchId: customer.runningBatchId!,
-      step: customer.currentStep ?? "HeronImport"
-    };
-    this.stepService.retry(req).subscribe((res)=>{
-      this.getCustomers();
-    })
-   }
+   getTooltip(element: any): string {
+      return element.canStartNewBatch
+        ? 'Crea batch'
+        : 'Batch già in esecuzione';
+    }
 
-   start(customer: customerWithBatchStatus){
-    const req:runStepRequest = {
-      batchId: customer.runningBatchId!,
-      step: customer.currentStep ?? "HeronImport"
-    };
-    this.stepService.run(req).subscribe((res)=>{
-      this.getCustomers();
-    })
-   }
-
-   openDetails(customer: any){
-    const dialogRef = this.dialog.open(DetailCustomerDialogComponent, {
-      data: customer,
-      width: '80vw',
-      maxWidth: '1000px'
-    });
-
-  }
-    
    updateCustomer(id:string){
     this.router.navigate(['/customers/add', id]);
   }

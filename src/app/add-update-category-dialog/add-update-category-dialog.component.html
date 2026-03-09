@@ -1,0 +1,45 @@
+<h1 mat-dialog-title>{{title}}</h1>
+<form [formGroup] = "categoryForm">
+  <mat-card class="trinta-card mb-10 bg-white border-none d-block">
+    <mat-card-content>
+      <div class="row g-3"> 
+        <div class="col-sm-12">
+          <label class="label d-block fw-medium mb-10">Categoria su Gestionale</label>
+          <mat-form-field class="w-100">
+            <i-feather name="command"></i-feather>
+            <mat-label>Inserisci il nome della categoria</mat-label>
+            <input matInput formControlName="sourceCategory" type="text">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-12">
+          <label class="label d-block fw-medium mb-10">Sotto categoria su Gestionale</label>
+          <mat-form-field class="w-100">
+            <i-feather name="command"></i-feather>
+            <mat-label>Inserisci il nome della sotto categoria</mat-label>
+            <input matInput formControlName="sourceSubCategory" type="text">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-12">
+          <label class="label d-block fw-medium mb-10">Categoria su Magento</label>
+          <mat-form-field class="w-100">
+            <i-feather name="command"></i-feather>
+            <mat-label>Inserisci il nome della categoria</mat-label>
+            <input matInput formControlName="targetCategory" type="text">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-12">
+          <label class="label d-block fw-medium mb-10">Sotto categoria su Magento</label>
+          <mat-form-field class="w-100">
+            <i-feather name="command"></i-feather>
+            <mat-label>Inserisci il nome della sotto categoria</mat-label>
+            <input matInput formControlName="targetSubCategory" type="text">
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</form>
+<mat-dialog-actions>
+  <button mat-button (click)="onClose()" class="btn back">Chiudi</button>
+  <button mat-flat-button (click)="onSave()" class="btn" [disabled]="categoryForm.invalid">Salva</button>
+</mat-dialog-actions>
