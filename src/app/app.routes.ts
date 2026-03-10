@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { NotFoundComponent } from './common/not-found/not-found.component';
 import { SignInComponent } from './authentication/sign-in/sign-in.component';
 import { AuthenticationComponent } from './authentication/authentication.component';
-import { HomeComponent } from './dashboard/home/home.component';
+import { HomeComponent } from './pages/home/home.component';
 import { CustomersComponent } from './pages/customers/customers.component';
 import { AddCustomerComponent } from './pages/customers/add/add-customer.component';
 import { SuppliersComponent } from './pages/suppliers/suppliers.component';

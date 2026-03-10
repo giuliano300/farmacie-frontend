@@ -94,7 +94,11 @@
 
                                 <span class="progress-text">
                                     {{element.farmadati.progress}}%
-                                    - <span class="restart" (click)="restart('Farmadati', element)">Avvia/Riavvia step</span>
+                                    - <span class="restart"
+                                        [class.disabled]="element.heronImport.progress < 100"
+                                        (click)="element.heronImport.progress === 100 && restart('Farmadati', element)">
+                                        Avvia/Riavvia step
+                                    </span>
                                 </span>
                             </div>
                         </td>
@@ -114,7 +118,11 @@
 
                                 <span class="progress-text">
                                     {{element.suppliers.progress}}%
-                                    - <span class="restart" (click)="restart('Suppliers', element)">Avvia/Riavvia step</span>
+                                    - <span class="restart"
+                                        [class.disabled]="element.farmadati.progress < 100"
+                                        (click)="element.farmadati.progress === 100 && restart('Suppliers', element)">
+                                        Avvia/Riavvia step
+                                    </span>
                                 </span>
                             </div>
                         </td>
@@ -124,28 +132,85 @@
                         <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
                             Magento
                         </th>
+
                         <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Magento">
-                             <div class="progress-container">
+
+                            <!-- STEP 1 -->
+                            <div class="progress-container">
+                                <div class="progress-label">1. Aggiunta prodotti</div>
+
                                 <mat-progress-bar
                                     mode="determinate"
-                                    [value]="element.magento.progress"
-                                    [color]="getColor(element.magento.progress)">
+                                    [value]="element.magento.progressInsert"
+                                    [color]="getColor(element.magento.progressInsert)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{element.magento.progress}}%
-                                    - <span class="restart" (click)="restart('Magento', element)">Avvia/Riavvia step</span>
+                                    {{element.magento.progressInsert}}%
+                                    - <span class="restart"
+                                        [class.disabled]="element.suppliers.progress < 100"
+                                        (click)="element.suppliers.progress === 100 && restartMagento('Magento-insert', element)">
+                                        Avvia/Riavvia step
+                                      </span>
                                 </span>
                             </div>
+
+                            <!-- STEP 2 -->
+                            <div class="progress-container"
+                                [class.disabled]="element.magento.progressInsert < 100">
+
+                                <div class="progress-label">2. Aggiornamento prezzi</div>
+
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.magento.progressUpdatePrice"
+                                    [color]="getColor(element.magento.progressUpdatePrice)">
+                                </mat-progress-bar>
+
+                                <span class="progress-text">
+                                    {{element.magento.progressUpdatePrice}}%
+                                    - <span class="restart"
+                                        (click)="restartMagento('Magento-update-price', element)">
+                                        Avvia/Riavvia step
+                                    </span>
+                                </span>
+                            </div>
+
+                            <!-- STEP 3 -->
+                            <div class="progress-container"
+                                [class.disabled]="element.magento.progressUpdatePrice < 100">
+
+                                <div class="progress-label">3. Upload immagini</div>
+
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.magento.progressInsertImages"
+                                    [color]="getColor(element.magento.progressInsertImages)">
+                                </mat-progress-bar>
+
+                                <span class="progress-text">
+                                    {{element.magento.progressInsertImages}}%
+                                    - <span class="restart"
+                                        (click)="restartMagento('Magento-insert-images', element)">
+                                        Avvia/Riavvia step
+                                    </span>
+                                </span>
+                                   
+                           </div>
+
                         </td>
                     </ng-container>
-
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell text-center no-data" [attr.colspan]="displayedColumns.length">
+                            Nessun batch presente
+                        </td>
+                    </tr>
+
                 </table>
             </div>
-            <mat-paginator [pageSizeOptions]="[20, 50, 100]"></mat-paginator>
         </div>
     </mat-card-content>
 </mat-card>

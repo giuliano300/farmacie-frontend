@@ -16,7 +16,7 @@ export interface BatchDashboardItem {
   heronImport: StepMetrics;
   farmadati: StepMetrics;
   suppliers: StepMetrics;
-  magento: StepMetrics;
+  magento: StepMetricsMagento;
 }
 
 export interface StepMetrics {
@@ -24,4 +24,17 @@ export interface StepMetrics {
   success: number;
   errors: number;
   progress: number;
+}
+
+export interface StepMetricsMagento {
+  total: number;
+  success: number;
+  insert: number;
+  updatePrice: number;
+  insertImages: number;
+  errors: number;
+  progress: number;
+  progressInsert: number;
+  progressUpdatePrice: number;
+  progressInsertImages: number;
 }

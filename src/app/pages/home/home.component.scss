@@ -526,3 +526,21 @@
 .accent{
   color: #db7f16
 }
+
+.progress-container {
+    margin-bottom: 8px;
+}
+
+.progress-label {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.progress-text {
+    font-size: 12px;
+}
+
+.disabled {
+    opacity: 0.4;
+}

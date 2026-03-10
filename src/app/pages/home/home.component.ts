@@ -17,6 +17,7 @@ import { StepService } from '../../services/step.service';
 import { runStepRequest } from '../../interfaces/runStepRequest';
 import { AlertDialogComponent } from '../../alert-dialog/alert-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MagentoService } from '../../services/magento.service';
 
 @Component({
     selector: 'app-home',
@@ -40,7 +41,8 @@ export class HomeComponent {
     constructor(private dashboardService: DashboardService, 
         private router: Router, 
         private stepService: StepService,      
-        private dialog: MatDialog
+        private dialog: MatDialog,
+        private magentoService: MagentoService
     ) {}
     dashobardItem: BatchDashboardItem[] = [];
     displayedColumns: string[] = ['name', 'sequenceNumber', 'currentStep', 'stepStatus', 'heronImport.progress','farmadati.progress','suppliers.progress','magento.progress'];
@@ -51,6 +53,10 @@ export class HomeComponent {
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
     ngOnInit() {
+       this.getLoad();
+    }
+
+    getLoad(){
         this.load();
         interval(2500).subscribe(() => {
             this.load();
@@ -90,48 +96,49 @@ export class HomeComponent {
         return 'primary';      // blue
     }
 
-    restart(currentStep: string, row: any){
-
-        row.currentStep = currentStep;
-        row.stepStatus = 1;
-
-        const index = this.steps.indexOf(currentStep);
-
-        // azzera progress step cliccato e successivi
-        for (let i = index; i < this.steps.length; i++) {
-
-            const s = this.steps[i];
-
-            const key = s.charAt(0).toLowerCase() + s.slice(1);
-
-            if (row[key])
-                row[key].progress = 0;
+    restartMagento(currentStep: string, row: any){
+        if(currentStep === "Magento-insert")
+        {
+            this.dialog.open(AlertDialogComponent, {
+                width: '500px',
+                data: 
+                { 
+                    title: "Attenzione", 
+                    description: "L' importazione dei prodotti su magento richiede un tempo di sincronizzazione dei prodotti di almeno 10 minuti. Dopo questo tempo inizierà l'import reale sul portale web."
+                }
+            });
+            this.magentoService.massiveImport(row.batchId).subscribe(()=>{
+                this.getLoad();
+            });
         }
+        if(currentStep === "Magento-update-price")
+        {
+            this.magentoService.updateStockBulk(row.batchId).subscribe(()=>{
+                this.getLoad();
+            });
+        }
+        if(currentStep === "Magento-insert-images")
+        {
+            this.magentoService.updateImageBulk(row.batchId).subscribe(()=>{
+                this.getLoad();
+            });
+        }
+    }
 
-
+    restart(currentStep: string, row: any){
         const req:runStepRequest = {
             batchId: row.batchId,
             step: currentStep ?? "HeronImport"
         };
         this.stepService.retry(req).subscribe((res)=>{
-            this.load();
+            this.getLoad();
         });
-
-        if(currentStep == "Magento")
-          this.dialog.open(AlertDialogComponent, {
-            width: '500px',
-            data: 
-            { 
-                title: "Attenzione", 
-                description: "L' importazione dei prodotti su magento richiede un tempo di sincronizzazione dei prodotti di almeno 10 minuti. Dopo questo tempo inizierà l'import reale sul portale web."
-            }
-          });
     }
 
     getStatus(status:number){
         switch(status){
             case 0: 
-                return 'pending';
+                return 'in attesa';
             case 1:
                 return 'in corso';
             case 2:

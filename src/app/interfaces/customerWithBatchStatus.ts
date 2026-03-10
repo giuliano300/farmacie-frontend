@@ -13,4 +13,6 @@ export interface customerWithBatchStatus {
   currentStep?: string;
 
   stepStatus?: stepStatus;
+
+  createdAt?: Date;
 }

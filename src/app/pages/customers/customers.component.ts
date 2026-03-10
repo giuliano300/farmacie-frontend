@@ -48,7 +48,7 @@ export class CustomersComponent {
     }
 
     ngOnInit(): void {
-        this.getCustomers();
+      this.getCustomers();
     }
     
 
@@ -91,6 +91,23 @@ export class CustomersComponent {
 
   }
 
+  isEnabled(element: customerWithBatchStatus){
+    if(element.canStartNewBatch)
+      return true;
+
+    const dateFromApi = new Date(element.createdAt!);
+    const today = new Date();
+
+    // rimuovo l'orario
+    dateFromApi.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    if (dateFromApi.getTime() != today.getTime())
+        return true;
+
+    return false;
+  }
+
   createBatch(id: string){
       this.batchesService.create(id).subscribe((data: any)=>{
         if(data.batchId){
@@ -106,7 +123,7 @@ export class CustomersComponent {
    }
 
    getTooltip(element: any): string {
-      return element.canStartNewBatch
+      return this.isEnabled(element)
         ? 'Crea batch'
         : 'Batch già in esecuzione';
     }
