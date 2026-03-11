@@ -18,6 +18,8 @@ import { runStepRequest } from '../../interfaces/runStepRequest';
 import { AlertDialogComponent } from '../../alert-dialog/alert-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MagentoService } from '../../services/magento.service';
+import { BatchesService } from '../../services/batches.service';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-home',
@@ -31,7 +33,8 @@ import { MagentoService } from '../../services/magento.service';
     MatFormFieldModule, 
     CommonModule,
     MatProgressBarModule,
-    MatCardModule
+    MatCardModule,
+    MatTooltip
 ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
@@ -39,6 +42,7 @@ import { MagentoService } from '../../services/magento.service';
 export class HomeComponent {
 
     constructor(private dashboardService: DashboardService, 
+        private batchesService: BatchesService,
         private router: Router, 
         private stepService: StepService,      
         private dialog: MatDialog,
@@ -50,7 +54,7 @@ export class HomeComponent {
 
     steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
 
-    @ViewChild(MatPaginator) paginator!: MatPaginator;
+    @ViewChild(MatPaginator) paginator!: MatPaginator
 
     ngOnInit() {
        this.getLoad();
@@ -70,7 +74,6 @@ export class HomeComponent {
             ...x.activeBatches,
             ...x.completedBatches
             ];
-
 
             this.dashobardItem = all.map(dashobardItem => ({
                 ...dashobardItem, 
@@ -94,6 +97,12 @@ export class HomeComponent {
         }
 
         return 'primary';      // blue
+    }
+
+    deleteBatch(b: any){
+        this.batchesService.delete(b.batch.batchId!).subscribe(()=>{
+          this.getLoad();
+        });    
     }
 
     restartMagento(currentStep: string, row: any){
@@ -120,6 +129,12 @@ export class HomeComponent {
         if(currentStep === "Magento-insert-images")
         {
             this.magentoService.updateImageBulk(row.batchId).subscribe(()=>{
+                this.getLoad();
+            });
+        }
+        if(currentStep === "update-force")
+        {
+            this.magentoService.finalizeBatchAsync(row.batchId).subscribe(()=>{
                 this.getLoad();
             });
         }

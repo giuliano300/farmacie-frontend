@@ -29,7 +29,7 @@ import { runStepRequest } from '../../interfaces/runStepRequest';
 export class CustomersComponent {
 
     customers: customerWithBatchStatus[] = []; 
-    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'categories', 'suppliers', 'create', 'action'];
+    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'categories', 'suppliers', 'batches', 'create', 'action'];
     dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
 
     constructor(
@@ -61,6 +61,7 @@ export class CustomersComponent {
                 create:'ri-play-fill',
                 categories: 'ri-search-line',
                 suppliers: 'ri-search-line',
+                batches: 'ri-search-line',
                 action: {
                     details: 'ri-search-line',
                     update: 'ri-pencil-line',
@@ -152,5 +153,9 @@ export class CustomersComponent {
         console.log("Close");
       }
     });
+  }
+
+  showBatches(id:string){
+       this.router.navigate(['/customer/history', id]);
   }
 }

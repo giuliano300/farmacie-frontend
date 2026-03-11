@@ -23,4 +23,8 @@ export class MagentoService {
       return this.http.get(this.apiUrl + "/updateImageBulk?batchId=" + batchId);
     }
 
+    finalizeBatchAsync(batchId: string){
+      return this.http.get(this.apiUrl + "/finalizeBatchAsync?batchId=" + batchId);
+    }
+
 }
