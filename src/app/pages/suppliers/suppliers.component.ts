@@ -14,10 +14,11 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { SuppliersService } from '../../services/suppliers.service';
 import { CommonModule, DatePipe } from '@angular/common';
+import { MatProgressBar } from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-suppliers',
-    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, DatePipe, CommonModule],
+    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, DatePipe, CommonModule, MatProgressBar],
     templateUrl: './suppliers.component.html',
     styleUrl: './suppliers.component.scss'
 })
@@ -26,6 +27,7 @@ export class SuppliersComponent {
     suppliers: suppliers[] = []; 
     displayedColumns: string[] = ['id','name', 'code', 'active', 'lastUpdate', 'sincro', 'action'];
     dataSource = new MatTableDataSource<suppliers>(this.suppliers);
+    firstLoading: boolean = true;
 
     constructor(private dialog: MatDialog, private suppliersService: SuppliersService, private router: Router) {}
 
@@ -42,21 +44,23 @@ export class SuppliersComponent {
     }
 
     getSuppliers(){
-        this.suppliersService.getSuppliers().subscribe((data: suppliers[]) => {
-            // Aggiungi la proprietà action a ogni categoria esistente
-            this.suppliers = data.map(supplier => ({
-                ...supplier, 
-                sincro: 'ri-restart-line',
-                action: {
-                    update: 'ri-pencil-line',
-                    delete: 'ri-delete-bin-line'
-                }
-            }));
+      this.firstLoading = true;
+      this.suppliersService.getSuppliers().subscribe((data: suppliers[]) => {
+          // Aggiungi la proprietà action a ogni categoria esistente
+          this.suppliers = data.map(supplier => ({
+              ...supplier, 
+              sincro: 'ri-restart-line',
+              action: {
+                  update: 'ri-pencil-line',
+                  delete: 'ri-delete-bin-line'
+              }
+          }));
 
-            //console.log(JSON.stringify(this.suppliers));
-            this.dataSource = new MatTableDataSource<suppliers>(this.suppliers);
-            this.dataSource.paginator = this.paginator;
-        });
+          //console.log(JSON.stringify(this.suppliers));
+          this.dataSource = new MatTableDataSource<suppliers>(this.suppliers);
+          this.dataSource.paginator = this.paginator;
+          this.firstLoading = false;
+      });
    }
     
    updateSupplier(id:string){

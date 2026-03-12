@@ -105,6 +105,9 @@
 
                 </table>
             </div>
+            <div class="progress">
+                <mat-progress-bar *ngIf="firstLoading" mode="indeterminate"></mat-progress-bar>
+            </div>
             <mat-paginator [pageSizeOptions]="[20, 50, 100]"></mat-paginator>
         </div>
     </mat-card-content>

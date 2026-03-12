@@ -572,3 +572,9 @@
 .disabled {
     opacity: 0.4;
 }
+
+.progress{
+    .mdc-linear-progress{
+        max-width: 100%;
+    }
+}

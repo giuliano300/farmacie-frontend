@@ -13,7 +13,7 @@ export class StepService {
     constructor(private http: HttpClient) {}
 
     run(runStepRequest: runStepRequest){
-      return this.http.post(this.apiUrl + "/run", runStepRequest);
+      return this.http.post(this.apiUrl + "/run-pipeline", runStepRequest);
     }
 
     retry(runStepRequest: runStepRequest){

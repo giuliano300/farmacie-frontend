@@ -16,11 +16,12 @@ import { customerWithBatchStatus } from '../../../interfaces/customerWithBatchSt
 import { CompleteBatchesItem } from '../../../interfaces/CompleteBatchesItem';
 import { BatchesService } from '../../../services/batches.service';
 import { CustomersService } from '../../../services/customers.service';
+import { MatProgressBar } from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-history',
-    imports: [MatCardModule, 
-      MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule],
+    imports: [MatCardModule,
+    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule, MatProgressBar],
     templateUrl: './history.component.html',
     styleUrl: './history.component.scss'
 })
@@ -32,6 +33,7 @@ export class HistoryComponent {
 
     customerId: string | undefined = undefined;
     customer: customerWithBatchStatus | undefined;
+    firstLoading: boolean = true;
 
     constructor(private dialog: MatDialog, 
       private batchesService: BatchesService,
@@ -53,6 +55,7 @@ export class HistoryComponent {
     }
 
     get(){
+      this.firstLoading = true;
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');
         if (!id) this.router.navigate(["customers"]);
@@ -77,6 +80,7 @@ export class HistoryComponent {
             //console.log(JSON.stringify(this.batch));
             this.dataSource = new MatTableDataSource<CompleteBatchesItem>(this.batch);
             this.dataSource.paginator = this.paginator;
+            this.firstLoading = false;
         });
       });
    }

@@ -19,10 +19,11 @@ import { CommonModule } from '@angular/common';
 import { BatchesService } from '../../services/batches.service';
 import { StepService } from '../../services/step.service';
 import { runStepRequest } from '../../interfaces/runStepRequest';
+import { MatProgressBar } from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-customers',
-    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule],
+    imports: [MatCardModule, MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule, MatProgressBar],
     templateUrl: './customers.component.html',
     styleUrl: './customers.component.scss'
 })
@@ -31,6 +32,7 @@ export class CustomersComponent {
     customers: customerWithBatchStatus[] = []; 
     displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'categories', 'suppliers', 'batches', 'create', 'action'];
     dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
+    firstLoading: boolean = true;
 
     constructor(
       private dialog: MatDialog, 
@@ -53,6 +55,7 @@ export class CustomersComponent {
     
 
     getCustomers(){
+      this.firstLoading = true;
         this.customersService.getCustomers().subscribe((data: customerWithBatchStatus[]) => {
             // Aggiungi la proprietà action a ogni categoria esistente
             //console.log(data);
@@ -72,6 +75,7 @@ export class CustomersComponent {
             //console.log(JSON.stringify(this.customers));
             this.dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
             this.dataSource.paginator = this.paginator;
+            this.firstLoading = false;
         });
     }
 
@@ -110,17 +114,36 @@ export class CustomersComponent {
   }
 
   createBatch(id: string){
-      this.batchesService.create(id).subscribe((data: any)=>{
-        if(data.batchId){
-          const req: runStepRequest = {
-            batchId: data.batchId,
-            step: "HeronImport"
-          };
-          this.stepService.run(req).subscribe((res)=>{
-            this.getCustomers();
-          })
-        }
-      })
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '500px',
+      data:
+      {
+        title: "Vuoi avviare un nuovo batch?",
+        description:"Dopo l'avvio puoi controllare in dashboard lo stato di avanzamento del batch.",
+        btnDeleteText: "Avvia batch"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.batchesService.create(id).subscribe((data: any)=>{
+          if(data.batchId){
+            const req: runStepRequest = {
+              batchId: data.batchId,
+              step: "HeronImport"
+            };
+            this.stepService.retry(req).subscribe((res)=>{
+              this.getCustomers();
+            })
+          }
+        })
+      } 
+      else 
+      {
+        console.log("Close");
+      }
+    });
    }
 
    getTooltip(element: any): string {

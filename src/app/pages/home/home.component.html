@@ -24,18 +24,6 @@
                             </div>
                         </td>
                     </ng-container>
-                    <ng-container matColumnDef="sequenceNumber">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini4">
-                            N°
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini4" data-label="N°">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{element.sequenceNumber}}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
                     <ng-container matColumnDef="currentStep">
                         <th mat-header-cell *matHeaderCellDef class="pl-0">
                             Step corrente
@@ -232,6 +220,9 @@
 
                 </table>
             </div>
+        </div>
+        <div class="progress">
+            <mat-progress-bar *ngIf="firstLoading" mode="indeterminate"></mat-progress-bar>
         </div>
     </mat-card-content>
 </mat-card>

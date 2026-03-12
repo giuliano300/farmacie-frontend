@@ -17,11 +17,12 @@ import { ConfirmDialogComponent } from '../../../confirm-dialog/confirm-dialog.c
 import { CustomersService } from '../../../services/customers.service';
 import { customerWithBatchStatus } from '../../../interfaces/customerWithBatchStatus';
 import { AddUpdateProducerDialogComponent } from '../../../add-update-producer-dialog/add-update-producer-dialog.component';
+import { MatProgressBar } from "@angular/material/progress-bar";
 
 @Component({
     selector: 'app-producers',
-    imports: [MatCardModule, 
-      MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule],
+    imports: [MatCardModule,
+    MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule, MatProgressBar],
     templateUrl: './producers.component.html',
     styleUrl: './producers.component.scss'
 })
@@ -33,6 +34,7 @@ export class ProducersComponent {
 
     customerId: string | undefined = undefined;
     customer: customerWithBatchStatus | undefined;
+    firstLoading: boolean = true;
 
     constructor(private dialog: MatDialog, 
       private producerService: ProducerMappingService, 
@@ -54,6 +56,7 @@ export class ProducersComponent {
     }
 
     getproducer(){
+      this.firstLoading = true;
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');
         if (!id) this.router.navigate(["customers"]);
@@ -77,6 +80,7 @@ export class ProducersComponent {
             //console.log(JSON.stringify(this.producer));
             this.dataSource = new MatTableDataSource<ProducerMapping>(this.producer);
             this.dataSource.paginator = this.paginator;
+            this.firstLoading = false;
         });
       });
    }

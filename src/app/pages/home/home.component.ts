@@ -1,11 +1,11 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, DestroyRef, ViewChild } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
 import { BatchDashboardItem, DashboardResponse } from '../../interfaces/dashboard';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { interval } from 'rxjs';
+import { filter, interval, switchMap, timer } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
@@ -20,6 +20,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MagentoService } from '../../services/magento.service';
 import { BatchesService } from '../../services/batches.service';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-home',
@@ -46,28 +48,35 @@ export class HomeComponent {
         private router: Router, 
         private stepService: StepService,      
         private dialog: MatDialog,
-        private magentoService: MagentoService
+        private magentoService: MagentoService,
+        private destroyRef: DestroyRef
     ) {}
     dashobardItem: BatchDashboardItem[] = [];
-    displayedColumns: string[] = ['name', 'sequenceNumber', 'currentStep', 'stepStatus', 'heronImport.progress','farmadati.progress','suppliers.progress','magento.progress'];
+    displayedColumns: string[] = ['name', 'currentStep', 'stepStatus', 'heronImport.progress','farmadati.progress','suppliers.progress','magento.progress'];
     dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
 
+    firstLoading: boolean = true;
     steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
 
     @ViewChild(MatPaginator) paginator!: MatPaginator
 
     ngOnInit() {
+       this.firstLoading = true;
        this.getLoad();
     }
 
     getLoad(){
-        this.load();
-        interval(2500).subscribe(() => {
-            this.load();
-        });
+        timer(0, 2500)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                filter(() => document.visibilityState === 'visible'),
+                switchMap(async () => this.load())
+            )
+            .subscribe();
     }
 
     load() {
+        
         this.dashboardService.getDashboard().subscribe(x => {
 
             const all = [
@@ -83,6 +92,7 @@ export class HomeComponent {
             //console.log(JSON.stringify(this.customers));
             this.dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
             this.dataSource.paginator = this.paginator;
+            this.firstLoading = false;
         });
     }
 
@@ -100,9 +110,29 @@ export class HomeComponent {
     }
 
     deleteBatch(b: any){
-        this.batchesService.delete(b.batch.batchId!).subscribe(()=>{
-          this.getLoad();
-        });    
+        const data = 
+        {
+            title: "Vuoi eliminare questo batch?",
+            description:"Dopo l'eliminazione tutti i dati verrano cancellati irreversibilmente.",
+            btnDeleteText: "Elimina batch"
+        }
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+              width: '500px',
+              data:data
+        });
+    
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) {
+                this.firstLoading = true;
+                this.batchesService.delete(b.batchId!).subscribe(()=>{
+                    this.getLoad();
+                });  
+            } 
+            else 
+            {
+                console.log("Close");
+            }
+        });
     }
 
     restartMagento(currentStep: string, row: any){
