@@ -27,6 +27,8 @@ export interface StepMetrics {
 }
 
 export interface StepMetricsMagento {
+  totalMagentoProducts: number;
+  totalDownloadMagentoProducts: number;
   total: number;
   success: number;
   insert: number;
@@ -34,6 +36,7 @@ export interface StepMetricsMagento {
   insertImages: number;
   errors: number;
   progress: number;
+  progressDownload: number;
   progressInsert: number;
   progressUpdatePrice: number;
   progressInsertImages: number;

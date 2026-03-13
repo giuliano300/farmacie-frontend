@@ -12,16 +12,19 @@ export class ConfirmDialogComponent {
   title: string = "CONFERMA ELIMINAZIONE";
   description: string = "Sei sicuro di voler eliminare questo elemento?";
   btnDeleteText: string = "Elimina";
+  chiudi: string = "Chiudi";
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data:  any
   ) {
-    if(data)
-    {
+    if(data.title)
       this.title = data.title;
+    if(data.description)
       this.description = data.description;
+    if(data.btnDeleteText)
       this.btnDeleteText = data.btnDeleteText;
-    }
+    if(data.chiudi)
+      this.chiudi = data.chiudi;
   }
 
   onConfirm(): void {

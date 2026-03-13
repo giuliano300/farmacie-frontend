@@ -55,12 +55,12 @@
                         <td mat-cell *matCellDef="let element" class="pl-0" data-label="Magento">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0 lh-20">
-                                    totale : {{ element.report?.totalProducts }}<br>
-                                    importati : {{ element.report.insert }}<br>
-                                    aggiornamento prezzi : {{ element.report.updatePrice }}<br>
-                                    aggiunta immagini : {{ element.report.insertImages }}<br>
-                                    errori : {{ element.report.errors }}<br>
-                                    stato importazione : {{ element.report.insert / element.report.totalProducts * 100 }} %<br>
+                                    totale : {{ !element.report ? 0 : element.report?.totalProducts }}<br>
+                                    importati : {{ !element.report ? 0 : element.report?.insert }}<br>
+                                    aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+                                    aggiunta immagini : {{ !element.report ? 0 : element.report?.insertImages }}<br>
+                                    errori : {{ !element.report ? 0 : element.report?.errors }}<br>
+                                    stato importazione : {{ !element.report ? 0 : element.report.insert / element.report.totalProducts * 100 }} %<br>
                                 </h6>
                             </div>
                         </td>

@@ -114,7 +114,8 @@ export class HomeComponent {
         {
             title: "Vuoi eliminare questo batch?",
             description:"Dopo l'eliminazione tutti i dati verrano cancellati irreversibilmente.",
-            btnDeleteText: "Elimina batch"
+            btnDeleteText: "Elimina batch",
+            chiudi: "Annulla"
         }
         const dialogRef = this.dialog.open(ConfirmDialogComponent, {
               width: '500px',
@@ -138,14 +139,6 @@ export class HomeComponent {
     restartMagento(currentStep: string, row: any){
         if(currentStep === "Magento-insert")
         {
-            this.dialog.open(AlertDialogComponent, {
-                width: '500px',
-                data: 
-                { 
-                    title: "Attenzione", 
-                    description: "L' importazione dei prodotti su magento richiede un tempo di sincronizzazione dei prodotti di almeno 10 minuti. Dopo questo tempo inizierà l'import reale sul portale web."
-                }
-            });
             this.magentoService.massiveImport(row.batchId).subscribe(()=>{
                 this.getLoad();
             });
@@ -164,8 +157,22 @@ export class HomeComponent {
         }
         if(currentStep === "update-force")
         {
-            this.magentoService.finalizeBatchAsync(row.batchId).subscribe(()=>{
-                this.getLoad();
+            const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+                width: '500px',
+                data: 
+                { 
+                    title: "Chiusura batch", 
+                    description:"Stai terminando anticipatamente il batch. Tutte le operazioni di import saranno concluse.",
+                    btnDeleteText: "Termina batch",
+                    chiudi: "Annulla"
+                }
+            });
+            dialogRef.afterClosed().subscribe((result: any) => {
+                if (result) {
+                    this.magentoService.finalizeBatchAsync(row.batchId).subscribe(()=>{
+                        this.getLoad();
+                    });
+                }
             });
         }
     }
@@ -208,5 +215,9 @@ export class HomeComponent {
             default:
                 return "Step sconosciuto";
         }
+    }
+
+    getDurata(element: any){
+        
     }
 }

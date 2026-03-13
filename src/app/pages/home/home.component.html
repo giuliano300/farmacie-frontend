@@ -21,6 +21,7 @@
                                 <h6 class="mt-0 mb-0">
                                     {{element.customer.name}}<br>
                                 </h6>
+                                <h4>Durata {{getDurata(element)}}</h4>
                             </div>
                         </td>
                     </ng-container>
@@ -133,7 +134,28 @@
 
                             <!-- STEP 1 -->
                             <div class="progress-container">
-                                <div class="progress-label">1. Aggiunta prodotti</div>
+                                <div class="progress-label">1. Download prodotti</div>
+
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.magento.progressDownload"
+                                    [color]="getColor(element.magento.progressDownload)">
+                                </mat-progress-bar>
+
+                                <span class="progress-text">
+                                    {{element.magento.progressDownload}}%
+                                    <span class="restart" *ngIf="element.status != 2"
+                                        [class.disabled]="element.suppliers.progress < 100"
+                                        (click)="element.suppliers.progress === 100 && restartMagento('Magento-insert', element)">
+                                        - Avvia/Riavvia step
+                                      </span>
+                                </span>
+                            </div>
+
+                            <!-- STEP 2 -->
+                            <div class="progress-container"
+                                [class.disabled]="element.magento.progressDownload < 100">
+                                <div class="progress-label">2. Aggiunta prodotti</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -151,11 +173,11 @@
                                 </span>
                             </div>
 
-                            <!-- STEP 2 -->
+                            <!-- STEP 3 -->
                             <div class="progress-container"
                                 [class.disabled]="element.magento.progressInsert < 100">
 
-                                <div class="progress-label">2. Aggiornamento prezzi</div>
+                                <div class="progress-label">3. Aggiornamento prezzi</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -172,11 +194,11 @@
                                 </span>
                             </div>
 
-                            <!-- STEP 3 -->
+                            <!-- STEP 4 -->
                             <div class="progress-container"
                                 [class.disabled]="element.magento.progressUpdatePrice < 100">
 
-                                <div class="progress-label">3. Upload immagini</div>
+                                <div class="progress-label">4. Upload immagini</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -194,9 +216,8 @@
                                    
                            </div>
 
-                            <!-- STEP 3 -->
-                            <div class="progress-container" *ngIf="element.status != 2"
-                                [class.disabled]="element.magento.progressInsert < 100 && element.magento.progressUpdatePrice < 100 && element.magento.progressInsertImages < 100">
+                            <!-- STEP 5 -->
+                            <div class="progress-container" *ngIf="element.status != 2">
 
                                 <span class="progress-text">
                                     <span class="update-force"
