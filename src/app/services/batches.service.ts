@@ -35,6 +35,10 @@ export class BatchesService {
       return this.http.get<CompleteBatchesItem[]>(this.apiUrlHistory + "/history?customerId=" + customerId);
     }
 
+    today():Observable<CompleteBatchesItem[]>{
+      return this.http.get<CompleteBatchesItem[]>(this.apiUrlHistory + "/today");
+    }
+
     delete(id: string):Observable<boolean>{
       return this.http.delete<boolean>(this.apiUrlHistory + "/" + id);
     }

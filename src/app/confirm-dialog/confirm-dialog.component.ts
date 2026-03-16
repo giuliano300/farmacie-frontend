@@ -17,14 +17,17 @@ export class ConfirmDialogComponent {
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data:  any
   ) {
-    if(data.title)
-      this.title = data.title;
-    if(data.description)
-      this.description = data.description;
-    if(data.btnDeleteText)
-      this.btnDeleteText = data.btnDeleteText;
-    if(data.chiudi)
-      this.chiudi = data.chiudi;
+    if(data)
+    {
+      if(data.title)
+        this.title = data.title;
+      if(data.description)
+        this.description = data.description;
+      if(data.btnDeleteText)
+        this.btnDeleteText = data.btnDeleteText;
+      if(data.chiudi)
+        this.chiudi = data.chiudi;
+    }
   }
 
   onConfirm(): void {

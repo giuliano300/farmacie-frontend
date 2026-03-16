@@ -22,6 +22,7 @@ import { BatchesService } from '../../services/batches.service';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CompleteBatchesItem } from '../../interfaces/CompleteBatchesItem';
 
 @Component({
     selector: 'app-home',
@@ -52,17 +53,25 @@ export class HomeComponent {
         private destroyRef: DestroyRef
     ) {}
     dashobardItem: BatchDashboardItem[] = [];
+    batch: CompleteBatchesItem[] = []; 
     displayedColumns: string[] = ['name', 'currentStep', 'stepStatus', 'heronImport.progress','farmadati.progress','suppliers.progress','magento.progress'];
+    displayedColumnsT: string[] = ['Customer', 'StartedAt', 'currentStep', 'stepStatus', 'magento', 'action'];
     dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
+    dataSourceT = new MatTableDataSource<CompleteBatchesItem>(this.batch);
 
     firstLoading: boolean = true;
     steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
+
+    ticker = 0;
 
     @ViewChild(MatPaginator) paginator!: MatPaginator
 
     ngOnInit() {
        this.firstLoading = true;
        this.getLoad();
+       setInterval(() => {
+            this.ticker++;
+        }, 1000);
     }
 
     getLoad(){
@@ -76,7 +85,7 @@ export class HomeComponent {
     }
 
     load() {
-        
+        this.get();
         this.dashboardService.getDashboard().subscribe(x => {
 
             const all = [
@@ -149,12 +158,6 @@ export class HomeComponent {
                 this.getLoad();
             });
         }
-        if(currentStep === "Magento-insert-images")
-        {
-            this.magentoService.updateImageBulk(row.batchId).subscribe(()=>{
-                this.getLoad();
-            });
-        }
         if(currentStep === "update-force")
         {
             const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -217,7 +220,52 @@ export class HomeComponent {
         }
     }
 
-    getDurata(element: any){
-        
+    getDurata(element: BatchDashboardItem){
+        const diff = Date.now() - new Date(element.startedAt).getTime();
+
+        const sec = Math.floor(diff / 1000) % 60;
+        const min = Math.floor(diff / 60000) % 60;
+        const hour = Math.floor(diff / 3600000);
+
+        return `${min}min ${sec}sec`;
     }
+
+    get(){
+        this.batchesService.today().subscribe((data: CompleteBatchesItem[]) => {
+            this.batch = data.map(b => ({
+                ...b, 
+                values: '',
+                action: {
+                    update: 'ri-pencil-line',
+                    delete: 'ri-delete-bin-line'
+                }
+            }));
+
+            //console.log(JSON.stringify(this.batch));
+            this.dataSourceT = new MatTableDataSource<CompleteBatchesItem>(this.batch);
+            this.dataSourceT.paginator = this.paginator;
+        });
+    }
+    
+
+    DeleteItem(item:CompleteBatchesItem){
+
+        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+            width: '500px'
+        });
+
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) 
+            {
+            this.batchesService.delete(item.batch.batchId!).subscribe(()=>{
+                this.get();
+            });
+            } 
+            else 
+            {
+            console.log("Close");
+            }
+        });
+    }
+    
 }

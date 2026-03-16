@@ -18,6 +18,7 @@ export interface customers {
   magentoStoreCode: string;
   heronFolder: string;
   active: boolean;
+  msi: boolean;
   createdAt: Date;
   magento: MagentoConfig;
 }

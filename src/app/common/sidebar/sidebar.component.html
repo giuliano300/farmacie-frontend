@@ -77,7 +77,12 @@
                         </ul>
                     </mat-expansion-panel>
 
-
+                     <a routerLink="/farmadati" class="sidebar-menu-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                        <i-feather name="refresh-ccw"></i-feather>
+                        <span class="title">
+                             Aggiornamento Farmadati
+                        </span>
+                    </a>
                     <a class="sidebar-menu-link" (click)="logout()" href="#">
                         <i-feather name="home"></i-feather>
                         <span class="title">Logout</span>

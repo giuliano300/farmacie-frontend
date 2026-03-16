@@ -1,6 +1,6 @@
 <nav aria-label="breadcrumb" class="position-relative">
     <ol class="breadcrumb">
-        <li aria-current="page" class="breadcrumb-item active">Batch giornalieri</li>
+        <li aria-current="page" class="breadcrumb-item active">Batch giornalieri in corso</li>
     </ol>
 </nav>
 <mat-card
@@ -21,7 +21,7 @@
                                 <h6 class="mt-0 mb-0">
                                     {{element.customer.name}}<br>
                                 </h6>
-                                <h4>Durata {{getDurata(element)}}</h4>
+                                <h4>Durata import: {{getDurata(element)}} {{ticker && ''}}</h4>
                             </div>
                         </td>
                     </ng-container>
@@ -194,35 +194,17 @@
                                 </span>
                             </div>
 
-                            <!-- STEP 4 -->
-                            <div class="progress-container"
-                                [class.disabled]="element.magento.progressUpdatePrice < 100">
-
-                                <div class="progress-label">4. Upload immagini</div>
-
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.magento.progressInsertImages"
-                                    [color]="getColor(element.magento.progressInsertImages)">
-                                </mat-progress-bar>
-
-                                <span class="progress-text">
-                                    {{element.magento.progressInsertImages}}%
-                                    <span class="restart" *ngIf="element.status != 2"
-                                        (click)="restartMagento('Magento-insert-images', element)">
-                                        - Avvia/Riavvia step
-                                    </span>
-                                </span>
-                                   
-                           </div>
-
                             <!-- STEP 5 -->
                             <div class="progress-container" *ngIf="element.status != 2">
 
-                                <span class="progress-text">
+                                <span class="progress-text position-relative">
+                                    <span class="hr"></span>
                                     <span class="update-force"
                                         (click)="restartMagento('update-force', element)">
                                         Termina e aggiorna
+                                    </span>
+                                    <span class="load" *ngIf="element.magento.progressUpdatePrice == 100">
+                                        <i class="fa fa-spinner fa-spin"></i>
                                     </span>
                                 </span>
                                    
@@ -244,6 +226,110 @@
         </div>
         <div class="progress">
             <mat-progress-bar *ngIf="firstLoading" mode="indeterminate"></mat-progress-bar>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<nav aria-label="breadcrumb" class="position-relative">
+    <ol class="breadcrumb">
+        <li aria-current="page" class="breadcrumb-item active">Batch giornalieri chiusi</li>
+    </ol>
+</nav>
+<mat-card class="trinta-card to-do-list-card mb-25 bg-white border-none d-block">
+    <mat-card-content>
+        <div class="to-do-list-table">
+            <div class="table-responsive">
+                <table mat-table [dataSource]="dataSourceT">
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="Customer">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
+                            Cliente 
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Cliente">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{ element.batch.customer.name }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="StartedAt">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
+                            Data inizio
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Data">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{ element.batch.startedAt | date:'dd/MM/yyyy HH:mm' }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="currentStep">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Step 
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Step">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{ element.batch.currentStep }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="stepStatus">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
+                            Completato 
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Stato">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                    {{ element.batch.stepStatus < 2 ? 'Non completato' : 'completato' }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="magento">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0">
+                            Importazione su magento 
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Magento">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0 lh-20">
+                                    Totale : {{ !element.report ? 0 : element.report?.totalProducts }}<br>
+                                    Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
+                                    Aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+                                    Errori : {{ !element.report ? 0 : element.report?.errors }}<br>
+                                    Stato importazione : {{ !element.report ? 0 : element.report.insert / element.report.totalProducts * 100 }} %<br>
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef class="text-center pr-0 mini3">
+                            Azioni
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="text-center pr-0 mini3" data-label="Azioni">
+                            <div class="action">
+                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="elimina" matTooltipPosition="above" (click)="DeleteItem(element)">
+                                    <i class="{{element.action.delete}}"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsT"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsT;"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell text-center no-data" [attr.colspan]="displayedColumnsT.length">
+                            Nessun batch ancora chiuso oggi
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
         </div>
     </mat-card-content>
 </mat-card>

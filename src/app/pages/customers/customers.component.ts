@@ -30,7 +30,7 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 export class CustomersComponent {
 
     customers: customerWithBatchStatus[] = []; 
-    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'active', 'categories', 'suppliers', 'batches', 'create', 'action'];
+    displayedColumns: string[] = ['id','name', 'magentoStoreCode', 'msi', 'active', 'categories', 'suppliers', 'batches', 'create', 'action'];
     dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
     firstLoading: boolean = true;
 

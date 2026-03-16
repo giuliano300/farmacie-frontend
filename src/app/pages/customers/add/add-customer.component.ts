@@ -75,6 +75,7 @@ export class AddCustomerComponent {
       ftpImportPath: ['', [Validators.required]],
       magentoRootPath: ['', [Validators.required]],
       active: ['', [Validators.required]],
+      msi: ['', [Validators.required]],
       id: ['']
     });
 
@@ -93,6 +94,7 @@ export class AddCustomerComponent {
             this.customerForm.patchValue({
               name: data.customer.name,
               magentoStoreCode: data.customer.magentoStoreCode,
+              msi: data.customer.msi,
               baseUrl: data.customer.magento.baseUrl,
               token: data.customer.magento.token,
               ftpHost: data.customer.magento.ftpHost,
@@ -125,6 +127,7 @@ export class AddCustomerComponent {
         magentoStoreCode: formValue.magentoStoreCode,
         heronFolder: formValue.magentoStoreCode,
         active: formValue.active ?? true,
+        msi: formValue.msi ?? true,
         createdAt: new Date(),
         magento: {
           baseUrl: formValue.baseUrl,
