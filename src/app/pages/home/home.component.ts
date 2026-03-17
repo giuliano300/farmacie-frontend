@@ -227,7 +227,7 @@ export class HomeComponent {
         const min = Math.floor(diff / 60000) % 60;
         const hour = Math.floor(diff / 3600000);
 
-        return `${min}min ${sec}sec`;
+        return `${hour}h ${min}m ${sec}s`;
     }
 
     get(){
