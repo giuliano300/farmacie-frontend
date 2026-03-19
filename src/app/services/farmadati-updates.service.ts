@@ -3,6 +3,7 @@ import { API_URL } from '../../main';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { FarmadatiUpdates } from '../interfaces/farmadati-updates';
+import { FarmadatiUpdatesWithCustomer } from '../interfaces/farmadati-updates-with-customer';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,8 @@ export class FarmadatiUpdatesService {
     
     constructor(private http: HttpClient) {}
 
-    get():Observable<FarmadatiUpdates[]>{
-      return this.http.get<FarmadatiUpdates[]>(this.apiUrl);
+    get():Observable<FarmadatiUpdatesWithCustomer[]>{
+      return this.http.get<FarmadatiUpdatesWithCustomer[]>(this.apiUrl);
     }
 
     create(farmadatiUpdates: FarmadatiUpdates){

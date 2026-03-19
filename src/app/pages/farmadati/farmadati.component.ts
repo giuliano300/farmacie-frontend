@@ -18,6 +18,8 @@ import { FarmadatiUpdates } from '../../interfaces/farmadati-updates';
 import { FarmadatiUpdatesService } from '../../services/farmadati-updates.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, switchMap, timer } from 'rxjs';
+import { AddCustomerDialogComponent } from '../../add-customer-dialog/add-customer-dialog.component';
+import { FarmadatiUpdatesWithCustomer } from '../../interfaces/farmadati-updates-with-customer';
 
 @Component({
     selector: 'app-farmadati',
@@ -27,9 +29,9 @@ import { filter, switchMap, timer } from 'rxjs';
 })
 export class FarmadatiComponent {
 
-    farmadatiUpdates: FarmadatiUpdates[] = []; 
-    displayedColumns: string[] = ['id', 'startedAt', 'progress', 'endedAt', 'action'];
-    dataSource = new MatTableDataSource<FarmadatiUpdates>(this.farmadatiUpdates);
+    farmadatiUpdates: FarmadatiUpdatesWithCustomer[] = []; 
+    displayedColumns: string[] = ['customerId', 'startedAt', 'progress', 'endedAt', 'action'];
+    dataSource = new MatTableDataSource<FarmadatiUpdatesWithCustomer>(this.farmadatiUpdates);
     constructor(private dialog: MatDialog, private farmadatiUpdatesService: FarmadatiUpdatesService, private router: Router, private destroyRef: DestroyRef) {}
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -51,9 +53,11 @@ export class FarmadatiComponent {
     }
 
     getFarmadati(){
-      this.farmadatiUpdatesService.get().subscribe((data: FarmadatiUpdates[]) => {
+      this.farmadatiUpdatesService.get().subscribe((data: FarmadatiUpdatesWithCustomer[]) => {
           // Aggiungi la proprietà action a ogni categoria esistente
-          this.farmadatiUpdates = data.map(f => ({
+          this.farmadatiUpdates = data
+            .sort((a, b) => new Date(b.farmadatiUpdate!.startedAt!).getTime() - new Date(a.farmadatiUpdate!.startedAt!).getTime())
+            .map(f => ({              
               ...f, 
               progress: '',
               action: {
@@ -62,22 +66,34 @@ export class FarmadatiComponent {
           }));
 
           //console.log(JSON.stringify(this.suppliers));
-          this.dataSource = new MatTableDataSource<FarmadatiUpdates>(this.farmadatiUpdates);
+          this.dataSource = new MatTableDataSource<FarmadatiUpdatesWithCustomer>(this.farmadatiUpdates);
           this.dataSource.paginator = this.paginator;
       });
    }
     
     start(){
-      const f: FarmadatiUpdates = {
-        productNumber:0,
-        productWorked:0
-      };
-      this.farmadatiUpdatesService.create(f).subscribe((data)=>{
-        this.getFarmadati();
-      })
+      const dialogRef = this.dialog.open(AddCustomerDialogComponent, {
+        width: '500px'
+      });
+
+      dialogRef.afterClosed().subscribe((result: any) => {
+        if (result) {
+          const f: FarmadatiUpdates = {
+            customerId: result.customerId
+          };
+          this.farmadatiUpdatesService.create(f).subscribe((data)=>{
+            this.getFarmadati();
+          })        
+        } 
+        else 
+        {
+          console.log("Close");
+        }
+      });
+
     }
       
-    DeleteItem(item:FarmadatiUpdates){
+    DeleteItem(item:FarmadatiUpdatesWithCustomer){
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px'
@@ -85,7 +101,7 @@ export class FarmadatiComponent {
 
       dialogRef.afterClosed().subscribe((result: any) => {
         if (result) {
-          this.farmadatiUpdatesService.delete(item.id!)
+          this.farmadatiUpdatesService.delete(item.farmadatiUpdate!.id!)
             .subscribe((data: boolean) => {
               if(data){
                 this.getFarmadati();
@@ -99,8 +115,11 @@ export class FarmadatiComponent {
       });
     }
 
-    getProgressBarValue(element: FarmadatiUpdates){
-      const total = !element.productNumber ? 0 : element.productWorked! / element.productNumber! * 100;
+    getProgressBarValue(element: FarmadatiUpdatesWithCustomer){
+      if(element.farmadatiUpdate!.productNumber == 0)
+        return 100;
+
+      const total = !element.farmadatiUpdate!.productNumber ? 0 : element.farmadatiUpdate!.productWorked! / element.farmadatiUpdate!.productNumber! * 100;
       return  total.toFixed(2);
     }
 }

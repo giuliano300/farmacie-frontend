@@ -91,7 +91,7 @@ export class AddSupplierComponent {
               active: data.active,
               ftpHost: data.ftpHost,
               ftpUser: data.ftpUser,
-              ftpPassword: data.ftpUser,
+              ftpPassword: data.ftpPassword,
               id: this.id,
             });
           });
