@@ -20,4 +20,8 @@ export class StepService {
       return this.http.post<string>(this.apiUrl + "/retry", runStepRequest);
     }
 
+    retryByType(runStepRequest: runStepRequest){
+      return this.http.post<string>(this.apiUrl + "/retryByType", runStepRequest);
+    }
+
 }

@@ -12,6 +12,7 @@ export interface BatchDashboardItem {
 
   currentStep: string;
   stepStatus: number;
+  type: number;
 
   heronImport: StepMetrics;
   farmadati: StepMetrics;

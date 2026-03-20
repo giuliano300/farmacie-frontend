@@ -23,6 +23,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CompleteBatchesItem } from '../../interfaces/CompleteBatchesItem';
+import { AddBatchDialogComponent } from '../../add-batch-dialog/add-batch-dialog.component';
 
 @Component({
     selector: 'app-home',
@@ -60,6 +61,7 @@ export class HomeComponent {
     dataSourceT = new MatTableDataSource<CompleteBatchesItem>(this.batch);
 
     firstLoading: boolean = true;
+    earlyClosing: boolean = false;
     steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
 
     ticker = 0;
@@ -172,8 +174,10 @@ export class HomeComponent {
             });
             dialogRef.afterClosed().subscribe((result: any) => {
                 if (result) {
+                    this.earlyClosing = true;
                     this.magentoService.finalizeBatchAsync(row.batchId).subscribe(()=>{
                         this.getLoad();
+                        this.earlyClosing = false;
                     });
                 }
             });
@@ -247,6 +251,44 @@ export class HomeComponent {
         });
     }
     
+    start(){
+        const dialogRef = this.dialog.open(AddBatchDialogComponent, {
+            width: '600px',
+            minWidth:'600px'
+        });
+
+        dialogRef.afterClosed().subscribe((result: any) => {
+            if (result) 
+            {
+                this.firstLoading = true;
+
+                this.batchesService.create(result.customerId, result.type).subscribe((data: any)=>{
+                    if(data.batchId){
+                        const req: runStepRequest = {
+                            batchId: data.batchId,
+                            step: "HeronImport",
+                            type: Number(result.type)
+                        };
+                        //console.log(req);
+                        if(result.type == 0)
+                            this.stepService.retry(req).subscribe((res)=>{
+                                this.get();
+                                this.firstLoading = false;
+                            })
+                        else
+                            this.stepService.retryByType(req).subscribe((res)=>{
+                                this.get();
+                                this.firstLoading = false;
+                            })
+                    }
+                })
+            } 
+            else 
+            {
+            console.log("Close");
+            }
+        });       
+    }
 
     DeleteItem(item:CompleteBatchesItem){
 

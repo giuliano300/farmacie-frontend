@@ -2,6 +2,7 @@
     <ol class="breadcrumb">
         <li aria-current="page" class="breadcrumb-item active">Batch giornalieri in corso</li>
     </ol>
+    <button class="btn-download btn btn-primary" (click)="start()"><i class="ri-add-line"></i> Avvia batch</button>
 </nav>
 <mat-card
     class="trinta-card to-do-list-card mb-25 bg-white border-none d-block"
@@ -134,7 +135,7 @@
 
                             <!-- STEP 1 -->
                             <div class="progress-container">
-                                <div class="progress-label">1. Download prodotti</div>
+                                <div class="progress-label">Download prodotti</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -144,7 +145,7 @@
 
                                 <span class="progress-text">
                                     {{element.magento.progressDownload}}%
-                                    <span class="restart" *ngIf="element.status != 2"
+                                    <span class="restart" *ngIf="element.status != 2 && element.type == 0"
                                         [class.disabled]="element.suppliers.progress < 100"
                                         (click)="element.suppliers.progress === 100 && restartMagento('Magento-insert', element)">
                                         - Avvia/Riavvia step
@@ -153,9 +154,9 @@
                             </div>
 
                             <!-- STEP 2 -->
-                            <div class="progress-container"
+                            <div class="progress-container" *ngIf="element.type < 2"
                                 [class.disabled]="element.magento.progressDownload < 100">
-                                <div class="progress-label">2. Aggiunta prodotti</div>
+                                <div class="progress-label">Aggiunta prodotti</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -165,8 +166,7 @@
 
                                 <span class="progress-text">
                                     {{element.magento.progressInsert}}%
-                                    <span class="restart" *ngIf="element.status != 2"
-                                        [class.disabled]="element.suppliers.progress < 100"
+                                    <span class="restart" *ngIf="element.status != 2 && element.type == 0"
                                         (click)="element.suppliers.progress === 100 && restartMagento('Magento-insert', element)">
                                         - Avvia/Riavvia step
                                       </span>
@@ -174,10 +174,10 @@
                             </div>
 
                             <!-- STEP 3 -->
-                            <div class="progress-container"
-                                [class.disabled]="element.magento.progressInsert < 100">
+                            <div class="progress-container" *ngIf="element.type < 3 && element.type != 1"
+                                [class.disabled]="element.magento.progressInsert < 100 && element.type == 0">
 
-                                <div class="progress-label">3. Aggiornamento prezzi</div>
+                                <div class="progress-label">Aggiornamento prezzi</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -187,10 +187,27 @@
 
                                 <span class="progress-text">
                                     {{element.magento.progressUpdatePrice}}%
-                                    <span class="restart" *ngIf="element.status != 2"
+                                    <span class="restart" *ngIf="element.status != 2 && element.type == 0"
                                         (click)="restartMagento('Magento-update-price', element)">
                                         - Avvia/Riavvia step
                                     </span>
+                                </span>
+                            </div>
+
+                            <!-- STEP 4 -->
+                            <div class="progress-container" *ngIf="element.type == 3"
+                                [class.disabled]="element.magento.progressInsertImages < 100 && element.type == 0">
+
+                                <div class="progress-label">Inserimento immagini</div>
+
+                                <mat-progress-bar
+                                    mode="determinate"
+                                    [value]="element.magento.progressInsertImages"
+                                    [color]="getColor(element.magento.progressInsertImages)">
+                                </mat-progress-bar>
+
+                                <span class="progress-text">
+                                    {{element.magento.progressInsertImages}}%
                                 </span>
                             </div>
 
@@ -203,7 +220,12 @@
                                         (click)="restartMagento('update-force', element)">
                                         Termina e aggiorna
                                     </span>
-                                    <span class="load" *ngIf="element.magento.progressUpdatePrice == 100">
+                                    <span class="load" 
+                                        *ngIf="(element.magento.progressInsert == 100 && element.type < 2) 
+                                        || (element.magento.progressUpdatePrice == 100 && element.type < 3 && element.type != 1)
+                                        || (element.magento.progressImages == 100 && element.type == 3)
+                                        || earlyClosing
+                                        ">
                                         <i class="fa fa-spinner fa-spin"></i>
                                     </span>
                                 </span>
@@ -298,10 +320,23 @@
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0 lh-20">
                                     Totale : {{ !element.report ? 0 : element.report?.totalProducts }}<br>
-                                    Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
-                                    Aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+
+                                    <span *ngIf="element.batch.type == 0 || element.batch.type == 1">
+                                      Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
+                                    </span>
+                                    <span *ngIf="element.batch.type == 0 || element.batch.type == 2">
+                                        Aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+                                    </span>
+                                    <span *ngIf="element.batch.type == 3">
+                                        Inserimento immagini : {{ !element.report ? 0 : element.report?.insertImages }}<br>
+                                    </span>
                                     Errori : {{ !element.report ? 0 : element.report?.errors }}<br>
-                                    Stato importazione : {{ !element.report ? 0 : element.report.insert / element.report.totalProducts * 100 }} %<br>
+                                    <span *ngIf="element.batch.type != 3">
+                                        Stato importazione : {{ (!element.report ? 0 : element.report.insert / element.report.totalProducts * 100).toFixed(2) }} %<br>
+                                    </span>
+                                    <span *ngIf="element.batch.type == 3">
+                                        Stato importazione : {{ (!element.report ? 0 : element.report.insertImages / element.report.totalProducts * 100).toFixed(2) }} %<br>
+                                    </span>
                                 </h6>
                             </div>
                         </td>

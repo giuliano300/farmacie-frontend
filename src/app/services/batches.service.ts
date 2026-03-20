@@ -15,8 +15,8 @@ export class BatchesService {
     
     constructor(private http: HttpClient) {}
 
-    create(customerId: string):Observable<string>{
-      return this.http.post<string>(this.apiUrl + "/create?customerId=" + customerId, null);
+    create(customerId: string, type?: number):Observable<string>{
+      return this.http.post<string>(this.apiUrl + "/create?customerId=" + customerId + "&type=" + type, null);
     }
 
     start(batchId: string):Observable<string>{

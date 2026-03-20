@@ -131,7 +131,8 @@ export class CustomersComponent {
           if(data.batchId){
             const req: runStepRequest = {
               batchId: data.batchId,
-              step: "HeronImport"
+              step: "HeronImport",
+              type: 0
             };
             this.stepService.retry(req).subscribe((res)=>{
               this.getCustomers();

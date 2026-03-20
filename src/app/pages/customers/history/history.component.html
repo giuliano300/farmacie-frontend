@@ -56,10 +56,23 @@
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0 lh-20">
                                     Totale : {{ !element.report ? 0 : element.report?.totalProducts }}<br>
-                                    Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
-                                    Aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+
+                                    <span *ngIf="element.batch.type == 0 || element.batch.type == 1">
+                                      Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
+                                    </span>
+                                    <span *ngIf="element.batch.type == 0 || element.batch.type == 2">
+                                        Aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+                                    </span>
+                                    <span *ngIf="element.batch.type == 3">
+                                        Inserimento immagini : {{ !element.report ? 0 : element.report?.insertImages }}<br>
+                                    </span>
                                     Errori : {{ !element.report ? 0 : element.report?.errors }}<br>
-                                    Stato importazione : {{ !element.report ? 0 : element.report.insert / element.report.totalProducts * 100 }} %<br>
+                                    <span *ngIf="element.batch.type != 3">
+                                        Stato importazione : {{ (!element.report ? 0 : element.report.insert / element.report.totalProducts * 100).toFixed(2) }} %<br>
+                                    </span>
+                                    <span *ngIf="element.batch.type == 3">
+                                        Stato importazione : {{ (!element.report ? 0 : element.report.insertImages / element.report.totalProducts * 100).toFixed(2) }} %<br>
+                                    </span>
                                 </h6>
                             </div>
                         </td>
