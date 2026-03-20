@@ -272,12 +272,12 @@ export class HomeComponent {
                         //console.log(req);
                         if(result.type == 0)
                             this.stepService.retry(req).subscribe((res)=>{
-                                this.get();
+                                this.getLoad();
                                 this.firstLoading = false;
                             })
                         else
                             this.stepService.retryByType(req).subscribe((res)=>{
-                                this.get();
+                                this.getLoad();
                                 this.firstLoading = false;
                             })
                     }

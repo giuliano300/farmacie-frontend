@@ -127,7 +127,7 @@ export class CustomersComponent {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.batchesService.create(id).subscribe((data: any)=>{
+        this.batchesService.create(id, 0).subscribe((data: any)=>{
           if(data.batchId){
             const req: runStepRequest = {
               batchId: data.batchId,
