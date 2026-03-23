@@ -19,7 +19,7 @@ const firebaseConfig = {
 };
 
 // Definisci l'URL globale dell'API
-export const API_URL = 'http://localhost:5273/api/';
+export const API_URL = 'https://api.plumasync.it/api/';
 
 bootstrapApplication(AppComponent, {
   providers: [

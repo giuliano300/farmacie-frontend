@@ -25,7 +25,7 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 export class SuppliersComponent {
 
     suppliers: suppliers[] = []; 
-    displayedColumns: string[] = ['id','name', 'code', 'active', 'lastUpdate', 'sincro', 'action'];
+    displayedColumns: string[] = ['name', 'code', 'active', 'lastUpdate', 'sincro', 'action'];
     dataSource = new MatTableDataSource<suppliers>(this.suppliers);
     firstLoading: boolean = true;
 

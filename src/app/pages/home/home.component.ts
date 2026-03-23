@@ -62,6 +62,7 @@ export class HomeComponent {
 
     firstLoading: boolean = true;
     earlyClosing: boolean = false;
+    firstLoadingClose: boolean = false;
     steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
 
     ticker = 0;
@@ -248,6 +249,7 @@ export class HomeComponent {
             //console.log(JSON.stringify(this.batch));
             this.dataSourceT = new MatTableDataSource<CompleteBatchesItem>(this.batch);
             this.dataSourceT.paginator = this.paginator;
+            this.firstLoadingClose = false;
         });
     }
     
@@ -299,9 +301,10 @@ export class HomeComponent {
         dialogRef.afterClosed().subscribe((result: any) => {
             if (result) 
             {
-            this.batchesService.delete(item.batch.batchId!).subscribe(()=>{
-                this.get();
-            });
+                this.firstLoadingClose = true;
+                this.batchesService.delete(item.batch.batchId!).subscribe(()=>{
+                    this.get();
+                });
             } 
             else 
             {

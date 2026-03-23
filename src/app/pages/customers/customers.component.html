@@ -12,23 +12,11 @@
                 <table mat-table [dataSource]="dataSource">
 
                     <!-- Name Column -->
-                    <ng-container matColumnDef="id">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
-                            Id
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Id">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{element.customer.id}}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
                     <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
                             Nome
                         </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Nome">
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Nome">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
                                     {{element.customer.name}}
