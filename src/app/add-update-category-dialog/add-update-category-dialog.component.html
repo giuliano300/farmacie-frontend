@@ -1,45 +1,84 @@
-<h1 mat-dialog-title>{{title}}</h1>
-<form [formGroup] = "categoryForm">
-  <mat-card class="trinta-card mb-10 bg-white border-none d-block">
-    <mat-card-content>
-      <div class="row g-3"> 
-        <div class="col-sm-12">
-          <label class="label d-block fw-medium mb-10">Categoria su Gestionale</label>
-          <mat-form-field class="w-100">
-            <i-feather name="command"></i-feather>
-            <mat-label>Inserisci il nome della categoria</mat-label>
-            <input matInput formControlName="sourceCategory" type="text">
-          </mat-form-field>
-        </div>
-        <div class="col-sm-12">
-          <label class="label d-block fw-medium mb-10">Sotto categoria su Gestionale</label>
-          <mat-form-field class="w-100">
-            <i-feather name="command"></i-feather>
-            <mat-label>Inserisci il nome della sotto categoria</mat-label>
-            <input matInput formControlName="sourceSubCategory" type="text">
-          </mat-form-field>
-        </div>
-        <div class="col-sm-12">
-          <label class="label d-block fw-medium mb-10">Categoria su Magento</label>
-          <mat-form-field class="w-100">
-            <i-feather name="command"></i-feather>
-            <mat-label>Inserisci il nome della categoria</mat-label>
-            <input matInput formControlName="targetCategory" type="text">
-          </mat-form-field>
-        </div>
-        <div class="col-sm-12">
-          <label class="label d-block fw-medium mb-10">Sotto categoria su Magento</label>
-          <mat-form-field class="w-100">
-            <i-feather name="command"></i-feather>
-            <mat-label>Inserisci il nome della sotto categoria</mat-label>
-            <input matInput formControlName="targetSubCategory" type="text">
-          </mat-form-field>
-        </div>
+<h1 mat-dialog-title>Mappatura categorie</h1>
+<div class="container" (click)="stopPropagation($event)">
+
+
+  <!-- BOX SELEZIONE -->
+  <div class="mapping-box">
+
+    <!-- GESTIONALE -->
+    <div class="field">
+      <label>Categoria Gestionale</label>
+
+      <input
+        type="text"
+        [(ngModel)]="gestionaleSearch"
+        (focus)="onGestionaleFocus()"
+        (input)="onGestionaleSearch(gestionaleSearch)"
+        placeholder="Cerca categoria gestionale..."
+      />
+
+      <ul *ngIf="filteredGestionale.length" class="dropdown">
+        <li *ngFor="let g of filteredGestionale"
+            (click)="selectGestionale(g)">
+          {{ g.label }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- FRECCIA -->
+    <div class="arrow">→</div>
+
+    <!-- MAGENTO -->
+    <div class="field">
+      <label>Categoria Magento</label>
+
+      <input
+        type="text"
+        [(ngModel)]="magentoSearch"
+        (focus)="onMagentoFocus()"
+        (input)="onMagentoSearch(magentoSearch)"
+        placeholder="Cerca categoria Magento..."
+      />
+
+      <ul *ngIf="filteredMagento.length" class="dropdown">
+        <li *ngFor="let m of filteredMagento"
+            (click)="selectMagento(m)">
+          {{ m.path }}
+        </li>
+      </ul>
+    </div>
+
+    <button mat-button class="btn" (click)="addMapping()">
+      + Aggiungi
+    </button>
+
+  </div>
+
+  <!-- LISTA -->
+  <div class="list-box" *ngIf="mappings.length">
+
+    <h3>Mapping creati</h3>
+
+    <div *ngFor="let m of mappings; let i = index" class="mapping-row">
+
+      <div class="tag gestionale">
+        {{ getGestionaleLabel(m.gestionaleKey) }}
       </div>
-    </mat-card-content>
-  </mat-card>
-</form>
-<mat-dialog-actions>
-  <button mat-button (click)="onClose()" class="btn back">Chiudi</button>
-  <button mat-flat-button (click)="onSave()" class="btn" [disabled]="categoryForm.invalid">Salva</button>
-</mat-dialog-actions>
+
+      <div class="arrow-small">→</div>
+
+      <div class="tag magento">
+        {{ getMagentoPath(m.magentoCategoryId) }}
+      </div>
+
+      <button class="delete-btn" (click)="removeMapping(i)">✕</button>
+
+    </div>
+
+  </div>
+
+  <button mat-button class="btn save" (click)="save()">
+    Salva tutto
+  </button>
+
+</div>

@@ -4,9 +4,9 @@ export interface CategoryMapping {
 
   customerId: string;
 
-  sourceCategory: string;
-  sourceSubCategory: string;
+  gestionaleKey: string;
 
-  targetCategory: string;
-  targetSubCategory: string;
+  magentoCategoryId: number;
+
+  magentoPath: string;
 }

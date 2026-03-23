@@ -29,12 +29,13 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 export class CategoriesComponent {
 
     categories: CategoryMapping[] = []; 
-    displayedColumns: string[] = ['sourceCategory', 'sourceSubCategory', 'targetCategory', 'targetSubCategory', 'action'];
+    displayedColumns: string[] = ['sourceCategory', 'sourceSubCategory', 'magentoPath', 'action'];
     dataSource = new MatTableDataSource<CategoryMapping>(this.categories);
 
     customerId: string | undefined = undefined;
     customer: customerWithBatchStatus | undefined;
     firstLoading: boolean = true;
+    isUpdating: boolean = false;
 
     constructor(private dialog: MatDialog, 
       private categoriesService: CategoryMappingService, 
@@ -85,20 +86,18 @@ export class CategoriesComponent {
       });
    }
 
-   addCategory(){
+    addCategory(){
      const dialogRef = this.dialog.open(AddUpdateCategoryDialogComponent, {
-      width: '500px'
+      width: '1000px',
+      minWidth: '1000px',
+      minHeight:'300px',
+      data: this.customerId
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) 
       {
-        const cat: CategoryMapping = {
-          ...result,
-          customerId: this.customerId
-        }
-
-        this.categoriesService.create(cat).subscribe((res)=>{
+        this.categoriesService.setMultipleMapping(this.customerId!, result).subscribe((res)=>{
           this.getCategories();
         })
       } 
@@ -109,6 +108,13 @@ export class CategoriesComponent {
     });
    }
     
+   update(){
+    this.isUpdating = true;
+      this.categoriesService.SetMagentoManagementCategories(this.customerId!).subscribe((res)=>{
+          this.isUpdating = false;
+      })
+   }
+
    updateCategory(category: CategoryMapping){
      const dialogRef = this.dialog.open(AddUpdateCategoryDialogComponent, {
        data: category,

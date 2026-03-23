@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CategoryMapping } from '../interfaces/category-mapping';
 import { API_URL } from '../../main';
+import { CustomerMagentoCategory } from '../interfaces/CustomerMagentoCategory';
+import { CustomerManagementCategory } from './CustomerManagementCategory';
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +19,28 @@ export class CategoryMappingService  {
       return this.http.get<CategoryMapping[]>(this.apiUrl + "?customerId=" + customerId);
     }
 
+    getMagentoCategories(customerId: string): Observable<CustomerMagentoCategory[]>{
+      return this.http.get<CustomerMagentoCategory[]>(this.apiUrl + "/GetMagentoCategories?customerId=" + customerId);
+    }
+
+    getManagementCategories(customerId: string): Observable<CustomerManagementCategory[]>{
+      return this.http.get<CustomerManagementCategory []>(this.apiUrl + "/GetManagementCategories?customerId=" + customerId);
+    }
+
     getById(id: string): Observable<CategoryMapping> {
       return this.http.get<CategoryMapping>(`${this.apiUrl}/${id}`);
     }
 
+    SetMagentoManagementCategories(customerId: string): Observable<CustomerMagentoCategory[]> {
+      return this.http.get<CustomerMagentoCategory[]>(`${this.apiUrl}/SetMagentoManagementCategories?customerId=${customerId}`);
+    }
+
     create(category: CategoryMapping): Observable<CategoryMapping> {
       return this.http.post<CategoryMapping>(this.apiUrl, category);
+    }
+
+    setMultipleMapping(customerId: string, category: CategoryMapping[]): Observable<CategoryMapping[]> {
+      return this.http.post<CategoryMapping[]>(this.apiUrl + "/SetMultipleMapping?customerId=" + customerId, category);
     }
 
     update(id: string, category: CategoryMapping): Observable<boolean> {

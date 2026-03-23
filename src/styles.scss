@@ -289,6 +289,10 @@ h2[mat-dialog-title] {
     border-radius: 5px;
     font-family: 'Poppins'!important;
 }
+
+.btn-secondary{
+    background:var(--warningColor);
+}
   
 .cancel-button{
     background:var(--dangerColor);
@@ -310,6 +314,12 @@ h2[mat-dialog-title] {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.btn-download-before {
+    position: absolute;
+    top: 0;
+    right: 210px;
 }
 
 .breadcrumb{
