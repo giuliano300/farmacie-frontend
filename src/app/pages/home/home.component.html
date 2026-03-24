@@ -177,7 +177,7 @@
                             <div class="progress-container" *ngIf="element.type < 3 && element.type != 1"
                                 [class.disabled]="element.magento.progressInsert < 100 && element.type == 0">
 
-                                <div class="progress-label">Aggiornamento prezzi</div>
+                                <div class="progress-label">Aggiornamento quantità</div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -325,7 +325,7 @@
                                       Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
                                     </span>
                                     <span *ngIf="element.batch.type == 0 || element.batch.type == 2">
-                                        Aggiornamento prezzi : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+                                        Aggiornamento quantità : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
                                     </span>
                                     <span *ngIf="element.batch.type == 3">
                                         Inserimento immagini : {{ !element.report ? 0 : element.report?.insertImages }}<br>
