@@ -2,7 +2,11 @@
     <ol class="breadcrumb">
         <li aria-current="page" class="breadcrumb-item active">Produttori del cliente {{customer?.customer?.name}}</li>
     </ol>
-    <button class="btn-download btn btn-primary" (click)="addproducer()"><i class="ri-add-line"></i> Aggiungi produttore</button>
+    <button class="btn-download-before btn btn-secondary" (click)="update()">Aggiorna produttori</button>
+    <span class="hover-spin" *ngIf="isUpdating">
+        <i class="fa fa-spinner fa-spin"></i>
+    </span>
+    <button class="btn-download btn btn-primary" (click)="addproducer()"><i class="ri-add-line"></i> Aggiungi produttori</button>
 </nav>
 <mat-card
     class="trinta-card to-do-list-card mb-25 bg-white border-none d-block"
@@ -13,26 +17,26 @@
                 <table mat-table [dataSource]="dataSource">
 
                     <!-- Name Column -->
-                    <ng-container matColumnDef="sourceProducer">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
-                            Produttore
+                    <ng-container matColumnDef="managementLabel">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0">
+                            Produttore Gestionale
                         </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Produttore">
+                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Produttore Gestionale">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                    {{element.sourceProducer}}
+                                    {{element.managementLabel}}
                                 </h6>
                             </div>
                         </td>
                     </ng-container>
-                    <ng-container matColumnDef="targetProducer">
+                    <ng-container matColumnDef="magentoLabel">
                         <th mat-header-cell *matHeaderCellDef class="pl-0">
-                            Produttore Target
+                            Produttore Magento
                         </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Produttore Target">
+                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Produttore Magento">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                   {{ element.targetProducer }}
+                                   {{ element.magentoLabel }}
                                 </h6>
                             </div>
                         </td>
@@ -43,9 +47,6 @@
                         </th>
                         <td mat-cell *matCellDef="let element" class="text-center pr-0" data-label="Azioni">
                             <div class="action">
-                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="modifica" matTooltipPosition="above" (click)="updateProducer(element)">
-                                    <i class="{{element.action.update}}"></i>
-                                </button>
                                 <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="elimina" matTooltipPosition="above" (click)="DeleteItem(element)">
                                     <i class="{{element.action.delete}}"></i>
                                 </button>

@@ -29,12 +29,13 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 export class ProducersComponent {
 
     producer: ProducerMapping[] = []; 
-    displayedColumns: string[] = ['sourceProducer', 'targetProducer', 'action'];
+    displayedColumns: string[] = ['managementLabel', 'magentoLabel', 'action'];
     dataSource = new MatTableDataSource<ProducerMapping>(this.producer);
 
     customerId: string | undefined = undefined;
     customer: customerWithBatchStatus | undefined;
     firstLoading: boolean = true;
+    isUpdating: boolean = false;
 
     constructor(private dialog: MatDialog, 
       private producerService: ProducerMappingService, 
@@ -55,7 +56,14 @@ export class ProducersComponent {
       this.getproducer();
     }
 
-    getproducer(){
+   update(){
+    this.isUpdating = true;
+      this.producerService.SetMagentoManagementProducer(this.customerId!).subscribe((res)=>{
+          this.isUpdating = false;
+      })
+   }
+
+   getproducer(){
       this.firstLoading = true;
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');
@@ -72,7 +80,6 @@ export class ProducersComponent {
             this.producer = data.map(supplier => ({
                 ...supplier, 
                 action: {
-                    update: 'ri-pencil-line',
                     delete: 'ri-delete-bin-line'
                 }
             }));
@@ -87,18 +94,17 @@ export class ProducersComponent {
 
    addproducer(){
      const dialogRef = this.dialog.open(AddUpdateProducerDialogComponent, {
-      width: '500px'
+      width: '1000px',
+      minWidth: '1000px',
+      minHeight:'300px',
+      data: this.customerId
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
+      console.log(result);
       if (result) 
       {
-        const cat: ProducerMapping = {
-          ...result,
-          customerId: this.customerId
-        }
-
-        this.producerService.create(cat).subscribe((res)=>{
+        this.producerService.setMultipleMapping(this.customerId!, result).subscribe((res)=>{
           this.getproducer();
         })
       } 
@@ -108,35 +114,7 @@ export class ProducersComponent {
       }
     });
    }
-    
-   updateProducer(producer: ProducerMapping){
-     const dialogRef = this.dialog.open(AddUpdateProducerDialogComponent, {
-       data: producer,
-       width: '500px'
-     });
-
-    dialogRef.afterClosed().subscribe((result: any) => {
-      if (result) 
-      {
-        //console.log(result);
-        const cat: ProducerMapping = {
-          ...result,
-          customerId: producer.customerId,
-          id: producer.id
-        }
-
-        this.producerService.update(producer.id!, cat).subscribe((res)=>{
-          this.getproducer();
-        })
-
-      } 
-      else 
-      {
-        console.log("Close");
-      }
-    });
-  }
-        
+            
   DeleteItem(item:ProducerMapping){
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {

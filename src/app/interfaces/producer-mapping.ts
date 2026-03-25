@@ -1,8 +1,10 @@
-
 export interface ProducerMapping {
   id?: string;
-
   customerId: string;
-  sourceProducer: string;
-  targetProducer: string;
+
+  magentoValue: string;
+  magentoLabel: string;
+
+  managementKey: string;
+  managementLabel: string;
 }
