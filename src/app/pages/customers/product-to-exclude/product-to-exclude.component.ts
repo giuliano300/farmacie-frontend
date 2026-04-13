@@ -10,27 +10,27 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatTooltip } from "@angular/material/tooltip";
-import { CommonModule, DatePipe } from '@angular/common';
-import { ProducerMapping } from '../../../interfaces/Producer-mapping';
-import { ProducerMappingService } from '../../../services/producer-mapping.service';
+import { CommonModule } from '@angular/common';
 import { ConfirmDialogComponent } from '../../../confirm-dialog/confirm-dialog.component';
 import { CustomersService } from '../../../services/customers.service';
 import { customerWithBatchStatus } from '../../../interfaces/customerWithBatchStatus';
-import { AddUpdateProducerDialogComponent } from '../../../add-update-producer-dialog/add-update-producer-dialog.component';
 import { MatProgressBar } from "@angular/material/progress-bar";
+import { ProductToExclude } from '../../../interfaces/Product-to-exclude';
+import { ProductToExcludeService } from '../../../services/product-to-exclude.service';
+import { AddProductToExcludeDialogComponent } from '../../../add-product-to-exclude-dialog/add-product-to-exclude-dialog.component';
 
 @Component({
-    selector: 'app-producers',
+    selector: 'app-product-to-exclude',
     imports: [MatCardModule,
     MatButtonModule, MatSlideToggleModule, MatMenuModule, MatPaginatorModule, MatTableModule, MatCheckboxModule, MatFormFieldModule, MatTooltip, CommonModule, MatProgressBar],
-    templateUrl: './producers.component.html',
-    styleUrl: './producers.component.scss'
+    templateUrl: './product-to-exclude.component.html',
+    styleUrl: './product-to-exclude.component.scss'
 })
-export class ProducersComponent {
+export class ProductToExcludeComponent {
 
-    producer: ProducerMapping[] = []; 
-    displayedColumns: string[] = ['managementLabel', 'magentoLabel', 'action'];
-    dataSource = new MatTableDataSource<ProducerMapping>(this.producer);
+    product: ProductToExclude[] = []; 
+    displayedColumns: string[] = ['productName', 'aic', 'action'];
+    dataSource = new MatTableDataSource<ProductToExclude>(this.product);
 
     customerId: string | undefined = undefined;
     customer: customerWithBatchStatus | undefined;
@@ -38,7 +38,7 @@ export class ProducersComponent {
     isUpdating: boolean = false;
 
     constructor(private dialog: MatDialog, 
-      private producerService: ProducerMappingService, 
+      private productService: ProductToExcludeService, 
       private customerService: CustomersService, 
       private router: Router,     
       private route: ActivatedRoute,
@@ -53,17 +53,10 @@ export class ProducersComponent {
     }
 
     ngOnInit(): void {
-      this.getproducer();
+      this.getProducts();
     }
 
-   update(){
-    this.isUpdating = true;
-      this.producerService.SetMagentoManagementProducer(this.customerId!).subscribe((res)=>{
-          this.isUpdating = false;
-      })
-   }
-
-   getproducer(){
+    getProducts(){
       this.firstLoading = true;
       this.route.paramMap.subscribe(params => {
         const id = params.get('id');
@@ -76,24 +69,25 @@ export class ProducersComponent {
         })
 
 
-        this.producerService.getAll(this.customerId!).subscribe((data: ProducerMapping[]) => {
-            this.producer = data.map(supplier => ({
-                ...supplier, 
+        this.productService.getAll(this.customerId!).subscribe((data: ProductToExclude[]) => {
+            this.product = data.map(p => ({
+                ...p, 
                 action: {
+                    update: 'ri-pencil-line',
                     delete: 'ri-delete-bin-line'
                 }
             }));
 
-            //console.log(JSON.stringify(this.producer));
-            this.dataSource = new MatTableDataSource<ProducerMapping>(this.producer);
+            //console.log(JSON.stringify(this.categories));
+            this.dataSource = new MatTableDataSource<ProductToExclude>(this.product);
             this.dataSource.paginator = this.paginator;
             this.firstLoading = false;
         });
       });
    }
 
-   addproducer(){
-     const dialogRef = this.dialog.open(AddUpdateProducerDialogComponent, {
+    addProducts(){
+     const dialogRef = this.dialog.open(AddProductToExcludeDialogComponent, {
       width: '1000px',
       minWidth: '1000px',
       minHeight:'300px',
@@ -101,11 +95,10 @@ export class ProducersComponent {
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      console.log(result);
       if (result) 
       {
-        this.producerService.setMultipleMapping(this.customerId!, result).subscribe((res)=>{
-          this.getproducer();
+        this.productService.setMultiple(result).subscribe((res)=>{
+          this.getProducts();
         })
       } 
       else 
@@ -114,8 +107,8 @@ export class ProducersComponent {
       }
     });
    }
-            
-  DeleteItem(item:ProducerMapping){
+
+   DeleteItem(item:ProductToExclude){
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '500px'
@@ -124,8 +117,8 @@ export class ProducersComponent {
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) 
       {
-        this.producerService.delete(item.id!).subscribe(()=>{
-          this.getproducer();
+        this.productService.delete(item.id!).subscribe(()=>{
+          this.getProducts();
         });
       } 
       else 
@@ -134,7 +127,7 @@ export class ProducersComponent {
       }
     });
   }
-  
+
   back(){
     this.router.navigate(["customers"]);
   }

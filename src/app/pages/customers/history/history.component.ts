@@ -104,4 +104,9 @@ export class HistoryComponent {
       }
     });
   }
+
+  back(){
+    this.router.navigate(["customers"]);
+  }
+
 }

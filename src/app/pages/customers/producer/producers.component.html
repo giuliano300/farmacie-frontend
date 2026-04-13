@@ -1,6 +1,6 @@
 <nav aria-label="breadcrumb" class="position-relative">
     <ol class="breadcrumb">
-        <li aria-current="page" class="breadcrumb-item active">Produttori del cliente {{customer?.customer?.name}}</li>
+        <li aria-current="page" class="breadcrumb-item active" (click)="back()">Produttori del cliente {{customer?.customer?.name}}</li>
     </ol>
     <button class="btn-download-before btn btn-secondary" (click)="update()">Aggiorna produttori</button>
     <span class="hover-spin" *ngIf="isUpdating">

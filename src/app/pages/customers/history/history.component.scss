@@ -478,3 +478,10 @@
 .lh-20{
     line-height: 20px;
 }
+
+.breadcrumb-item{
+    &:hover{
+        cursor: pointer;
+        color: var(--primaryColor);
+    }
+}

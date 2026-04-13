@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ProducerMapping } from '../interfaces/producer-mapping';
+import { ProducerMapping } from '../interfaces/Producer-mapping';
 import { API_URL } from '../../main';
 import { CustomerMagentoProducer } from '../interfaces/CustomerMagentoProducer';
 import { CustomerManagementProducer } from '../interfaces/CustomerManagementProducer';

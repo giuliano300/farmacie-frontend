@@ -14,12 +14,12 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatProgressBar } from "@angular/material/progress-bar";
-import { FarmadatiUpdates } from '../../interfaces/farmadati-updates';
+import { FarmadatiUpdates } from '../../interfaces/Farmadati-updates';
 import { FarmadatiUpdatesService } from '../../services/farmadati-updates.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, switchMap, timer } from 'rxjs';
 import { AddCustomerDialogComponent } from '../../add-customer-dialog/add-customer-dialog.component';
-import { FarmadatiUpdatesWithCustomer } from '../../interfaces/farmadati-updates-with-customer';
+import { FarmadatiUpdatesWithCustomer } from '../../interfaces/Farmadati-updates-with-customer';
 
 @Component({
     selector: 'app-farmadati',

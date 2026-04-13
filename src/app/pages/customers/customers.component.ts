@@ -30,7 +30,7 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 export class CustomersComponent {
 
     customers: customerWithBatchStatus[] = []; 
-    displayedColumns: string[] = ['name', 'magentoStoreCode', 'msi', 'active', 'categories', 'suppliers', 'batches', 'create', 'action'];
+    displayedColumns: string[] = ['name', 'magentoStoreCode', 'msi', 'active', 'products', 'categories', 'suppliers', 'batches', 'create', 'action'];
     dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
     firstLoading: boolean = true;
 
@@ -62,6 +62,7 @@ export class CustomersComponent {
             this.customers = data.map(customer => ({
                 ...customer, 
                 create:'ri-play-fill',
+                products: 'ri-search-line',
                 categories: 'ri-search-line',
                 suppliers: 'ri-search-line',
                 batches: 'ri-search-line',
@@ -86,6 +87,11 @@ export class CustomersComponent {
     getToProducers(id:string){
        this.router.navigate(['/customer/producers', id]);
     }
+
+    getToProductsToExclude(id:string){
+       this.router.navigate(['/customer/products-to-exclude', id]);
+    }
+
 
    openDetails(customer: any){
     const dialogRef = this.dialog.open(DetailCustomerDialogComponent, {

@@ -11,6 +11,7 @@ import { ProducersComponent } from './pages/customers/producer/producers.compone
 import { CategoriesComponent } from './pages/customers/categories/categories.component';
 import { HistoryComponent } from './pages/customers/history/history.component';
 import { FarmadatiComponent } from './pages/farmadati/farmadati.component';
+import { ProductToExcludeComponent } from './pages/customers/product-to-exclude/product-to-exclude.component';
 
 export const routes: Routes = [
     { path: '', redirectTo : '/authentication', pathMatch: 'full' },
@@ -29,6 +30,7 @@ export const routes: Routes = [
     {path: 'suppliers/add/:id', component: AddSupplierComponent},
     {path: 'suppliers', component: SuppliersComponent},
     {path: 'farmadati', component: FarmadatiComponent},
+    {path: 'customer/products-to-exclude/:id', component: ProductToExcludeComponent},
     {path: 'customer/categories/:id', component: CategoriesComponent},
     {path: 'customer/producers/:id', component: ProducersComponent},
     {path: 'customer/history/:id', component: HistoryComponent},

@@ -1,5 +1,5 @@
 import { BatchReport } from "./batch-report";
-import { BatchDashboardItem } from "./dashboard";
+import { BatchDashboardItem } from "./Dashboard";
 
 export interface CompleteBatchesItem {
   batch: BatchDashboardItem;

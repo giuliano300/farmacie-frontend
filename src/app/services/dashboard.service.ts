@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DashboardResponse } from '../interfaces/dashboard';
+import { DashboardResponse } from '../interfaces/Dashboard';
 import { API_URL } from '../../main';
 import { HttpClient } from '@angular/common/http';
 

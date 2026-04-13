@@ -162,4 +162,8 @@ export class CategoriesComponent {
       }
     });
   }
+
+  back(){
+    this.router.navigate(["customers"]);
+  }
 }

@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { API_URL } from '../../main';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { FarmadatiUpdates } from '../interfaces/farmadati-updates';
-import { FarmadatiUpdatesWithCustomer } from '../interfaces/farmadati-updates-with-customer';
+import { FarmadatiUpdates } from '../interfaces/Farmadati-updates';
+import { FarmadatiUpdatesWithCustomer } from '../interfaces/Farmadati-updates-with-customer';
 
 @Injectable({
   providedIn: 'root'

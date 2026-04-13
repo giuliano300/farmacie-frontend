@@ -1,7 +1,7 @@
 import { Component, DestroyRef, ViewChild } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
-import { BatchDashboardItem, DashboardResponse } from '../../interfaces/dashboard';
+import { BatchDashboardItem, DashboardResponse } from '../../interfaces/Dashboard';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';

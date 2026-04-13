@@ -1,5 +1,5 @@
 import { customers } from "./customer";
-import { FarmadatiUpdates } from "./farmadati-updates";
+import { FarmadatiUpdates } from "./Farmadati-updates";
 
 export class FarmadatiUpdatesWithCustomer {
   customer?: customers;
