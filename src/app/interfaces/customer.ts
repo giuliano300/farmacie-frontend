@@ -17,6 +17,10 @@ export interface customers {
   name: string;
   magentoStoreCode: string;
   heronFolder: string;
+  heronFtpFolder: string;
+  heronFtp: string;
+  heronUsername: string;
+  heronPassword: string;
   active: boolean;
   msi: boolean;
   createdAt: Date;
