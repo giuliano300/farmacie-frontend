@@ -61,7 +61,7 @@ input:focus {
   position: absolute;
   top: 60px;
   width: 100%;
-  max-height: 120px;
+  max-height: 200px;
   overflow: auto;
   background: white;
   border-radius: 8px;
@@ -169,4 +169,10 @@ input:focus {
 h3{
     font-size: 16px;
     font-weight: 400;
+}
+
+.dropdown li.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
 }

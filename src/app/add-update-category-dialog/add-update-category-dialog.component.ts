@@ -14,13 +14,17 @@ import { CategoryMappingService } from '../services/category-mapping.service';
 })
 export class AddUpdateCategoryDialogComponent implements OnInit {
 constructor(public dialogRef: MatDialogRef<AddUpdateCategoryDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data:  string,
+    @Inject(MAT_DIALOG_DATA) public data:  {
+      customerId: string,
+      existingMappings: any[]
+    },
     private categoriesService: CategoryMappingService
   ) {
   }
   // DATA
   managementCategories: any[] = [];
   magentoCategories: any[] = [];
+  existingMappings: any[] = [];
 
   // SELEZIONI
   selectedGestionale: any = null;
@@ -39,18 +43,28 @@ constructor(public dialogRef: MatDialogRef<AddUpdateCategoryDialogComponent>,
 
   ngOnInit(): void {
     this.loadData();
+    if (this.data?.existingMappings) {
+      this.existingMappings = [...this.data.existingMappings];
+    }
+  }
+
+  isGestionaleMapped(key: string): boolean {
+    return (
+      this.mappings.some(m => m.gestionaleKey === key) ||
+      this.existingMappings.some(m => m.gestionaleKey === key)
+    );
   }
 
   // MOCK DATA (sostituisci con API)
   loadData() {
-    this.categoriesService.getManagementCategories(this.data!).subscribe((data)=>{
+    this.categoriesService.getManagementCategories(this.data!.customerId!).subscribe((data)=>{
       this.managementCategories = data.map(x => ({
         key: x.key,
         label: `${x.category} | ${x.subCategory}`
       }));
     })
 
-    this.categoriesService.getMagentoCategories(this.data!).subscribe((res)=>{
+    this.categoriesService.getMagentoCategories(this.data!.customerId!).subscribe((res)=>{
        this.magentoCategories = res;
     })
   }
@@ -89,6 +103,8 @@ constructor(public dialogRef: MatDialogRef<AddUpdateCategoryDialogComponent>,
 
   // ✅ SELECT
   selectGestionale(cat: any) {
+    if (this.isGestionaleMapped(cat.key)) return;
+
     this.selectedGestionale = cat;
     this.gestionaleSearch = cat.label;
     this.filteredGestionale = [];
@@ -143,7 +159,7 @@ constructor(public dialogRef: MatDialogRef<AddUpdateCategoryDialogComponent>,
       const magento = this.magentoCategories.find(x => x.magentoCategoryId === m.magentoCategoryId);
 
         return {
-          customerId: this.data!,
+          customerId: this.data!.customerId,
           gestionaleKey: m.gestionaleKey,
           magentoCategoryId: m.magentoCategoryId,
           magentoPath: magento?.path || ''

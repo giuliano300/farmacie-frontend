@@ -65,6 +65,8 @@ export class HomeComponent {
     firstLoadingClose: boolean = false;
     steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
 
+    reindexMap: Record<string, any> = {};
+
     ticker = 0;
 
     @ViewChild(MatPaginator) paginator!: MatPaginator
@@ -91,17 +93,18 @@ export class HomeComponent {
         this.get();
         this.dashboardService.getDashboard().subscribe(x => {
 
-            const all = [
-            ...x.activeBatches,
-            ...x.completedBatches
-            ];
-
-            this.dashobardItem = all.map(dashobardItem => ({
-                ...dashobardItem, 
-                
+            x.activeBatches = x.activeBatches.map(batch => ({
+                ...batch,
+                reindexValues: {
+                    percent: 0,
+                    running: false,
+                    processed: 0,
+                    total: 0
+                }
             }));
 
-            //console.log(JSON.stringify(this.customers));
+            this.dashobardItem = x.activeBatches;
+
             this.dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
             this.dataSource.paginator = this.paginator;
             this.firstLoading = false;
@@ -148,6 +151,47 @@ export class HomeComponent {
         });
     }
 
+    checkAndCall(element: any): boolean {
+
+        const result =
+            (element.magento.progressInsert == 100 && element.type < 2) ||
+            (element.magento.progressUpdatePrice == 100 && element.type < 3 && element.type != 1) ||
+            (element.magento.progressImages == 100 && element.type == 3) ||
+            this.earlyClosing;
+
+        if (result && !this.reindexMap[element.batchId]?.started) {
+
+            this.reindexMap[element.batchId] = {
+                started: true,
+                percent: 0,
+                running: false,
+                processed: 0,
+                total: 0
+            };
+
+            setInterval(() => {
+                this.getReindexStatus(element.batchId);
+            }, 2000);
+        }
+
+        return result;
+    }
+
+    getReindexStatus(batchId: string) {
+
+        this.dashboardService
+            .getReindexStatus(batchId)
+            .subscribe((reindexStatus) => {
+
+                this.reindexMap[batchId] = {
+
+                    ...this.reindexMap[batchId],
+
+                    ...reindexStatus
+                };
+            });
+    }
+    
     restartMagento(currentStep: string, row: any){
         if(currentStep === "Magento-insert")
         {

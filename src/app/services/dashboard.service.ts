@@ -14,4 +14,8 @@ export class DashboardService {
     getDashboard() {
         return this.http.get<DashboardResponse>(this.apiUrl + '');
     }
+    
+    getReindexStatus(batchId: string) {
+        return this.http.get<DashboardResponse>(this.apiUrl + '/get-reindex-status?batchId=' + batchId);
+    }
 }

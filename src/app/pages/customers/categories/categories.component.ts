@@ -90,8 +90,11 @@ export class CategoriesComponent {
      const dialogRef = this.dialog.open(AddUpdateCategoryDialogComponent, {
       width: '1000px',
       minWidth: '1000px',
-      minHeight:'300px',
-      data: this.customerId
+      minHeight:'400px',
+      data: {
+        customerId: this.customerId,
+        existingMappings: this.categories
+      }
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
@@ -118,7 +121,8 @@ export class CategoriesComponent {
    updateCategory(category: CategoryMapping){
      const dialogRef = this.dialog.open(AddUpdateCategoryDialogComponent, {
        data: category,
-       width: '500px'
+       maxWidth: '1000px',
+       minHeight:'500px'
      });
 
     dialogRef.afterClosed().subscribe((result: any) => {

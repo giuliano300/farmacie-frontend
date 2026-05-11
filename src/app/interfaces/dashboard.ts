@@ -18,6 +18,7 @@ export interface BatchDashboardItem {
   farmadati: StepMetrics;
   suppliers: StepMetrics;
   magento: StepMetricsMagento;
+  reindexValues: ReindexStatus;
 }
 
 export interface StepMetrics {
@@ -41,4 +42,11 @@ export interface StepMetricsMagento {
   progressInsert: number;
   progressUpdatePrice: number;
   progressInsertImages: number;
+}
+
+export interface ReindexStatus {
+  running: boolean;
+  processed: number;
+  total: number;
+  percent: number;
 }

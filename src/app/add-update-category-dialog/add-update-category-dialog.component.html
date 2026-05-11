@@ -19,6 +19,7 @@
 
       <ul *ngIf="filteredGestionale.length" class="dropdown">
         <li *ngFor="let g of filteredGestionale"
+            [class.disabled]="isGestionaleMapped(g.key)"
             (click)="selectGestionale(g)">
           {{ g.label }}
         </li>
