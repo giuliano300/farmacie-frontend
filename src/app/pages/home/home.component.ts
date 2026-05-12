@@ -5,7 +5,6 @@ import { BatchDashboardItem, DashboardResponse } from '../../interfaces/Dashboar
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { filter, interval, switchMap, timer } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
@@ -24,6 +23,17 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CompleteBatchesItem } from '../../interfaces/CompleteBatchesItem';
 import { AddBatchDialogComponent } from '../../add-batch-dialog/add-batch-dialog.component';
+
+import {
+    Subject,
+    filter,
+    interval,
+    switchMap,
+    timer,
+    takeUntil,
+    tap,
+    EMPTY
+} from 'rxjs';
 
 @Component({
     selector: 'app-home',
@@ -71,44 +81,58 @@ export class HomeComponent {
 
     @ViewChild(MatPaginator) paginator!: MatPaginator
 
+    private stopLoad$ = new Subject<void>();
+
     ngOnInit() {
        this.firstLoading = true;
        this.getLoad();
-       setInterval(() => {
+       interval(1000)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
             this.ticker++;
-        }, 1000);
+        });
     }
 
-    getLoad(){
+    getLoad() {
+
         timer(0, 2500)
             .pipe(
+                takeUntil(this.stopLoad$),
                 takeUntilDestroyed(this.destroyRef),
+
                 filter(() => document.visibilityState === 'visible'),
-                switchMap(async () => this.load())
+
+                switchMap(() =>
+                    this.dashboardService.getDashboard()
+                ),
+
+                tap(x => {
+
+                    x.activeBatches = x.activeBatches.map(batch => ({
+
+                        ...batch,
+
+                        reindexValues:
+                            this.reindexMap[batch.batchId] ??
+                            {
+                                percent: 0,
+                                running: false,
+                                processed: 0,
+                                total: 0
+                            }
+                    }));
+
+                    this.dashobardItem = x.activeBatches;
+
+                    this.dataSource.data = this.dashobardItem;
+
+                    this.firstLoading = false;
+                    console.log("Dashboard updated");
+
+                    this.get();
+                })
             )
             .subscribe();
-    }
-
-    load() {
-        this.get();
-        this.dashboardService.getDashboard().subscribe(x => {
-
-            x.activeBatches = x.activeBatches.map(batch => ({
-                ...batch,
-                reindexValues: {
-                    percent: 0,
-                    running: false,
-                    processed: 0,
-                    total: 0
-                }
-            }));
-
-            this.dashobardItem = x.activeBatches;
-
-            this.dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
-            this.dataSource.paginator = this.paginator;
-            this.firstLoading = false;
-        });
     }
 
     getColor(progress: number): 'primary' | 'accent' | 'warn' {
@@ -161,6 +185,8 @@ export class HomeComponent {
 
         if (result && !this.reindexMap[element.batchId]?.started) {
 
+            this.stopLoad$.next();
+
             this.reindexMap[element.batchId] = {
                 started: true,
                 percent: 0,
@@ -189,6 +215,11 @@ export class HomeComponent {
 
                     ...reindexStatus
                 };
+
+                if(reindexStatus.percent == 100)
+                {
+                    this.getLoad();
+                }
             });
     }
     

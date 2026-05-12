@@ -94,6 +94,7 @@ export class HistoryComponent {
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) 
       {
+        this.firstLoading = true;
         this.batchesService.delete(item.batch.batchId!).subscribe(()=>{
           this.get();
         });

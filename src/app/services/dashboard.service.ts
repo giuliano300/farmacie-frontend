@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DashboardResponse } from '../interfaces/Dashboard';
+import { DashboardResponse, ReindexStatus } from '../interfaces/Dashboard';
 import { API_URL } from '../../main';
 import { HttpClient } from '@angular/common/http';
 
@@ -16,6 +16,6 @@ export class DashboardService {
     }
     
     getReindexStatus(batchId: string) {
-        return this.http.get<DashboardResponse>(this.apiUrl + '/get-reindex-status?batchId=' + batchId);
+        return this.http.get<ReindexStatus>(this.apiUrl + '/get-reindex-status?batchId=' + batchId);
     }
 }
