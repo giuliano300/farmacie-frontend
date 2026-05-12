@@ -9,8 +9,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 
 // Definisci l'URL globale dell'API
-// export const API_URL = 'https://api.plumasync.it/api/';
-export const API_URL = 'https://localhost:7121/api/';
+export const API_URL = 'https://api.plumasync.it/api/';
+// export const API_URL = 'https://localhost:7121/api/';
 
 bootstrapApplication(AppComponent, {
   providers: [
