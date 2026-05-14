@@ -23,6 +23,7 @@ export interface customers {
   heronPassword: string;
   active: boolean;
   msi: boolean;
+  ivaInclusive: boolean;
   createdAt: Date;
   magento: MagentoConfig;
 }

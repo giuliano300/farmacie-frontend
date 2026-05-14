@@ -80,6 +80,7 @@ export class AddCustomerComponent {
       magentoRootPath: ['', [Validators.required]],
       active: ['', [Validators.required]],
       msi: ['', [Validators.required]],
+      ivaInclusive: [false, [Validators.required]],
       id: ['']
     });
 
@@ -111,6 +112,7 @@ export class AddCustomerComponent {
               ftpImportPath: data.customer.magento.ftpImportPath,
               magentoRootPath: data.customer.magento.magentoRootPath,
               active: data.customer.active,
+              ivaInclusive: data.customer.ivaInclusive,
               id: this.id,
             });
           });
@@ -140,6 +142,7 @@ export class AddCustomerComponent {
         heronPassword: formValue.heronPassword,
         active: formValue.active ?? true,
         msi: formValue.msi ?? true,
+        ivaInclusive: formValue.ivaInclusive ?? false,
         createdAt: new Date(),
         magento: {
           baseUrl: formValue.baseUrl,

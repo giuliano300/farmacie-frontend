@@ -32,7 +32,7 @@
           </mat-form-field>
         </div>
 
-        <div class="col-sm-6 mb-10">
+        <div class="col-sm-4 mb-10">
           <label class="label d-block fw-medium mb-10">Msi (Multi Source Inventory)</label>
           <mat-form-field class="w-100">
             <i-feather name="activity"></i-feather>
@@ -44,7 +44,19 @@
           </mat-form-field>
         </div>
 
-        <div class="col-sm-6 mb-10">
+        <div class="col-sm-4 mb-10">
+          <label class="label d-block fw-medium mb-10">Iva compresa</label>
+          <mat-form-field class="w-100">
+            <i-feather name="activity"></i-feather>
+            <mat-label>Iva compresa</mat-label>
+            <mat-select formControlName="ivaInclusive">
+              <mat-option [value]="true">SI</mat-option>
+              <mat-option [value]="false">NO</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-sm-4 mb-10">
           <label class="label d-block fw-medium mb-10">Attivo</label>
           <mat-form-field class="w-100">
             <i-feather name="activity"></i-feather>
