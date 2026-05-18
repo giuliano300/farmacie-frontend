@@ -118,12 +118,14 @@
                         </td>
                     </ng-container>
 
+
                     <ng-container matColumnDef="magento.progress">
                         <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
                             Magento
                         </th>
 
                         <td mat-cell *matCellDef="let element" class="pl-0 mini3 position-relative" data-label="Magento">
+
                             <span class="spn-delete">
                                 <button (click)="deleteBatch(element)" 
                                     class="btn delete" 
@@ -133,9 +135,12 @@
                                 </button>
                             </span>
 
-                            <!-- STEP 1 -->
+                            <!-- DOWNLOAD PRODOTTI -->
                             <div class="progress-container">
-                                <div class="progress-label">Download prodotti</div>
+
+                                <div class="progress-label">
+                                    Download prodotti
+                                </div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -145,18 +150,24 @@
 
                                 <span class="progress-text">
                                     {{element.magento.progressDownload}}%
-                                    <span class="restart" *ngIf="element.status != 2 && element.type == 0"
+
+                                    <span class="restart"
+                                        *ngIf="element.status != 2"
                                         [class.disabled]="element.suppliers.progress < 100"
                                         (click)="element.suppliers.progress === 100 && restartMagento('Magento-insert', element)">
                                         - Avvia/Riavvia step
-                                      </span>
+                                    </span>
                                 </span>
                             </div>
 
-                            <!-- STEP 2 -->
-                            <div class="progress-container" *ngIf="element.type < 2"
+                            <!-- INSERIMENTO PRODOTTI -->
+                            <div class="progress-container"
+                                *ngIf="element.type == 0 || element.type == 1"
                                 [class.disabled]="element.magento.progressDownload < 100">
-                                <div class="progress-label">Aggiunta prodotti</div>
+
+                                <div class="progress-label">
+                                    Inserimento prodotti
+                                </div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -166,18 +177,23 @@
 
                                 <span class="progress-text">
                                     {{element.magento.progressInsert}}%
-                                    <span class="restart" *ngIf="element.status != 2 && element.type == 0"
+
+                                    <span class="restart"
+                                        *ngIf="element.status != 2"
                                         (click)="element.suppliers.progress === 100 && restartMagento('Magento-insert', element)">
                                         - Avvia/Riavvia step
-                                      </span>
+                                    </span>
                                 </span>
                             </div>
 
-                            <!-- STEP 3 -->
-                            <div class="progress-container" *ngIf="element.type < 3 && element.type != 1"
-                                [class.disabled]="element.magento.progressInsert < 100 && element.type == 0">
+                            <!-- AGGIORNAMENTO GIACENZE -->
+                            <div class="progress-container"
+                                *ngIf="element.type == 2"
+                                [class.disabled]="element.magento.progressDownload < 100">
 
-                                <div class="progress-label">Aggiornamento quantità</div>
+                                <div class="progress-label">
+                                    Aggiornamento giacenze
+                                </div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -187,18 +203,30 @@
 
                                 <span class="progress-text">
                                     {{element.magento.progressUpdatePrice}}%
-                                    <span class="restart" *ngIf="element.status != 2 && element.type == 0"
+
+                                    <span class="restart"
+                                        *ngIf="element.status != 2"
                                         (click)="restartMagento('Magento-update-price', element)">
                                         - Avvia/Riavvia step
                                     </span>
                                 </span>
                             </div>
 
-                            <!-- STEP 4 -->
-                            <div class="progress-container" *ngIf="element.type == 3"
-                                [class.disabled]="element.magento.progressInsertImages < 100 && element.type == 0">
+                            <!-- INSERIMENTO IMMAGINI -->
+                            <div class="progress-container"
+                                *ngIf="element.type == 3 || element.type == 0"
+                                [class.disabled]="element.magento.progressDownload < 100">
 
-                                <div class="progress-label">Inserimento immagini</div>
+                                <div class="progress-label">
+                                    Inserimento immagini
+                                    <br>
+
+                                    <small>
+                                        Possono trascorrere alcuni minuti
+                                        <br>
+                                        prima dell'inizio dell'import
+                                    </small>
+                                </div>
 
                                 <mat-progress-bar
                                     mode="determinate"
@@ -211,41 +239,75 @@
                                 </span>
                             </div>
 
-                            <!-- STEP 5 -->
-                            <div class="progress-container" *ngIf="element.status != 2">
+                            <!-- REINDEX -->
+                            <div class="progress-container" [class.disabled]="element.magento.progressDownload < 100">
 
                                 <span class="progress-text position-relative">
+
                                     <span *ngIf="checkAndCall(element)">
-                                        <div class="progress-label">Completamento reindex</div>
+
+                                        <div class="progress-label">
+                                            Completamento reindex
+                                        </div>
 
                                         <mat-progress-bar
                                             mode="determinate"
                                             [value]="reindexMap[element.batchId]?.percent"
-                                            [color]="getColor(element.magento.progressInsert)">
+                                            [color]="getColor(reindexMap[element.batchId]?.percent || 0)">
                                         </mat-progress-bar>
-                                         <span class="progress-text">
-                                            {{reindexMap[element.batchId]?.percent}}%
+
+                                        <span class="progress-text">
+                                            {{reindexMap[element.batchId]?.percent ?? 0}}%
                                         </span>
+
                                     </span>
+
                                     <span class="hr"></span>
+
                                     <span class="update-force"
                                         (click)="restartMagento('update-force', element)">
                                         Termina e aggiorna
                                     </span>
+
                                     <span class="load" 
-                                        *ngIf="(element.magento.progressInsert == 100 && element.type < 2) 
-                                        || (element.magento.progressUpdatePrice == 100 && element.type < 3 && element.type != 1)
-                                        || (element.magento.progressImages == 100 && element.type == 3)
-                                        || earlyClosing
+                                        *ngIf="
+                                            (
+                                                element.type == 1 &&
+                                                element.magento.progressInsert == 100
+                                            )
+                                            ||
+                                            (
+                                                element.type == 2 &&
+                                                element.magento.progressUpdatePrice == 100
+                                            )
+                                            ||
+                                            (
+                                                element.type == 3 &&
+                                                element.magento.progressInsertImages == 100
+                                            )
+                                            ||
+                                            (
+                                                element.type == 0 &&
+                                                element.magento.progressInsert == 100 &&
+                                                element.magento.progressInsertImages == 100
+                                            )
+                                            ||
+                                            earlyClosing
                                         ">
+
                                         <i class="fa fa-spinner fa-spin"></i>
+
                                     </span>
+
                                 </span>
-                                   
-                           </div>
+
+                            </div>
 
                         </td>
                     </ng-container>
+
+
+
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
@@ -324,35 +386,132 @@
                             </div>
                         </td>
                     </ng-container>
+
                     <ng-container matColumnDef="magento">
+
                         <th mat-header-cell *matHeaderCellDef class="pl-0">
                             Importazione su magento 
                         </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Magento">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0 lh-20">
-                                    Totale : {{ !element.report ? 0 : element.report?.totalProducts }}<br>
 
+                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Magento">
+
+                            <div class="position-relative">
+
+                                <h6 class="mt-0 mb-0 lh-20">
+
+                                    Totale :
+                                    {{ !element.report ? 0 : element.report?.totalProducts }}
+                                    <br>
+
+                                    <!-- PRODOTTI -->
                                     <span *ngIf="element.batch.type == 0 || element.batch.type == 1">
-                                      Importati/aggiornati : {{ !element.report ? 0 : element.report?.insert }}<br>
+
+                                        Importati/aggiornati :
+                                        {{ !element.report ? 0 : element.report?.insert }}
+                                        <br>
+
                                     </span>
-                                    <span *ngIf="element.batch.type == 0 || element.batch.type == 2">
-                                        Aggiornamento quantità : {{ !element.report ? 0 : element.report?.updatePrice }}<br>
+
+                                    <!-- GIACENZE -->
+                                    <span *ngIf="element.batch.type == 2">
+
+                                        Aggiornamento giacenze :
+                                        {{ !element.report ? 0 : element.report?.updatePrice }}
+                                        <br>
+
                                     </span>
+
+                                    <!-- IMMAGINI -->
+                                    <span *ngIf="element.batch.type == 3 || element.batch.type == 0">
+
+                                        Inserimento immagini :
+                                        {{ !element.report ? 0 : element.report?.insertImages }}
+                                        <br>
+
+                                    </span>
+
+                                    Errori :
+                                    {{ !element.report ? 0 : element.report?.errors }}
+                                    <br>
+
+                                    <!-- STATO SOLO PRODOTTI -->
+                                    <span *ngIf="element.batch.type == 1">
+
+                                        Stato importazione :
+                                        {{
+                                            (
+                                                !element.report
+                                                ? 0
+                                                : element.report.insert / element.report.totalProducts * 100
+                                            ).toFixed(2)
+                                        }} %
+                                        <br>
+
+                                    </span>
+
+                                    <!-- STATO SOLO GIACENZE -->
+                                    <span *ngIf="element.batch.type == 2">
+
+                                        Stato aggiornamento :
+                                        {{
+                                            (
+                                                !element.report
+                                                ? 0
+                                                : element.report.updatePrice / element.report.totalProducts * 100
+                                            ).toFixed(2)
+                                        }} %
+                                        <br>
+
+                                    </span>
+
+                                    <!-- STATO SOLO IMMAGINI -->
                                     <span *ngIf="element.batch.type == 3">
-                                        Inserimento immagini : {{ !element.report ? 0 : element.report?.insertImages }}<br>
+
+                                        Stato import immagini :
+                                        {{
+                                            (
+                                                !element.report
+                                                ? 0
+                                                : element.report.insertImages / element.report.totalProducts * 100
+                                            ).toFixed(2)
+                                        }} %
+                                        <br>
+
                                     </span>
-                                    Errori : {{ !element.report ? 0 : element.report?.errors }}<br>
-                                    <span *ngIf="element.batch.type != 3">
-                                        Stato importazione : {{ (!element.report ? 0 : element.report.insert / element.report.totalProducts * 100).toFixed(2) }} %<br>
+
+                                    <!-- COMPLETO -->
+                                    <span *ngIf="element.batch.type == 0">
+
+                                        Stato import prodotti :
+                                        {{
+                                            (
+                                                !element.report
+                                                ? 0
+                                                : element.report.insert / element.report.totalProducts * 100
+                                            ).toFixed(2)
+                                        }} %
+                                        <br>
+
+                                        Stato import immagini :
+                                        {{
+                                            (
+                                                !element.report
+                                                ? 0
+                                                : element.report.insertImages / element.report.totalProducts * 100
+                                            ).toFixed(2)
+                                        }} %
+                                        <br>
+
                                     </span>
-                                    <span *ngIf="element.batch.type == 3">
-                                        Stato importazione : {{ (!element.report ? 0 : element.report.insertImages / element.report.totalProducts * 100).toFixed(2) }} %<br>
-                                    </span>
+
                                 </h6>
+
                             </div>
+
                         </td>
+
                     </ng-container>
+
                     <ng-container matColumnDef="action">
                         <th mat-header-cell *matHeaderCellDef class="text-center pr-0 mini3">
                             Azioni

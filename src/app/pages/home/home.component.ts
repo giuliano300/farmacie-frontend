@@ -178,9 +178,28 @@ export class HomeComponent {
     checkAndCall(element: any): boolean {
 
         const result =
-            (element.magento.progressInsert == 100 && element.type < 2) ||
-            (element.magento.progressUpdatePrice == 100 && element.type < 3 && element.type != 1) ||
-            (element.magento.progressImages == 100 && element.type == 3) ||
+
+            (
+                element.magento.progressInsert >= 100 &&
+                (element.type == 0 || element.type == 1)
+            )
+
+            ||
+
+            (
+                element.magento.progressUpdatePrice >= 100 &&
+                element.type == 2
+            )
+
+            ||
+
+            (
+                element.magento.progressInsertImages >= 100 &&
+                (element.type == 0 || element.type == 3)
+            )
+
+            ||
+
             this.earlyClosing;
 
         if (result && !this.reindexMap[element.batchId]?.started) {
@@ -224,18 +243,21 @@ export class HomeComponent {
     }
     
     restartMagento(currentStep: string, row: any){
+
         if(currentStep === "Magento-insert")
         {
             this.magentoService.massiveImport(row.batchId).subscribe(()=>{
                 this.getLoad();
             });
         }
+
         if(currentStep === "Magento-update-price")
         {
             this.magentoService.updateStockBulk(row.batchId).subscribe(()=>{
                 this.getLoad();
             });
         }
+
         if(currentStep === "update-force")
         {
             const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -248,18 +270,24 @@ export class HomeComponent {
                     chiudi: "Annulla"
                 }
             });
+
             dialogRef.afterClosed().subscribe((result: any) => {
+
                 if (result) {
+
                     this.earlyClosing = true;
+
                     this.magentoService.finalizeBatchAsync(row.batchId).subscribe(()=>{
+
                         this.getLoad();
+
                         this.earlyClosing = false;
                     });
                 }
             });
         }
     }
-
+    
     restart(currentStep: string, row: any){
         const req:runStepRequest = {
             batchId: row.batchId,
@@ -328,43 +356,74 @@ export class HomeComponent {
         });
     }
     
+
     start(){
-        const dialogRef = this.dialog.open(AddBatchDialogComponent, {
-            width: '600px',
-            minWidth:'600px'
-        });
+
+        const dialogRef = this.dialog.open(
+            AddBatchDialogComponent,
+            {
+                width: '600px',
+                minWidth:'600px'
+            });
 
         dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) 
+
+            if (result)
             {
                 this.firstLoading = true;
 
-                this.batchesService.create(result.customerId, result.type).subscribe((data: any)=>{
-                    if(data.batchId){
-                        const req: runStepRequest = {
-                            batchId: data.batchId,
-                            step: "HeronImport",
-                            type: Number(result.type)
-                        };
-                        //console.log(req);
-                        if(result.type == 0)
-                            this.stepService.retry(req).subscribe((res)=>{
-                                this.getLoad();
-                                this.firstLoading = false;
-                            })
-                        else
-                            this.stepService.retryByType(req).subscribe((res)=>{
-                                this.getLoad();
-                                this.firstLoading = false;
-                            })
-                    }
-                })
-            } 
-            else 
-            {
-            console.log("Close");
+                this.batchesService
+                    .create(result.customerId, result.type)
+                    .subscribe((data: any) => {
+
+                        if(data.batchId){
+
+                            const req: runStepRequest = {
+
+                                batchId: data.batchId,
+                                step: "HeronImport",
+                                type: Number(result.type)
+                            };
+
+                            /*
+                                TYPE:
+
+                                0 = Completo
+                                1 = ImportProdotti
+                                2 = UpdatePrezzi
+                                3 = ImportImmagini
+                            */
+
+                            if(result.type == 0)
+                            {
+                                this.stepService
+                                    .retry(req)
+                                    .subscribe(() => {
+
+                                        this.getLoad();
+
+                                        this.firstLoading = false;
+                                    });
+                            }
+                            else
+                            {
+                                this.stepService
+                                    .retryByType(req)
+                                    .subscribe(() => {
+
+                                        this.getLoad();
+
+                                        this.firstLoading = false;
+                                    });
+                            }
+                        }
+                    });
             }
-        });       
+            else
+            {
+                console.log("Close");
+            }
+        });
     }
 
     DeleteItem(item:CompleteBatchesItem){

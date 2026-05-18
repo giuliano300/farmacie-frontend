@@ -506,7 +506,7 @@
 }
 
 .mdc-linear-progress{
-  max-width: 80%;
+  max-width: 85%;
 }
 
 .restart{
@@ -563,6 +563,13 @@
     font-size: 12px;
     font-weight: 500;
     margin-bottom: 3px;
+
+    small{
+        display: inline-block;
+        font-size: 11px!important;
+        color: var(--dangerColor);
+        line-height: 14px!important;
+    }
 }
 
 .progress-text {
