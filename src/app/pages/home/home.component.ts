@@ -95,7 +95,7 @@ export class HomeComponent {
 
     getLoad() {
 
-        timer(0, 2500)
+        timer(0, 500)
             .pipe(
                 takeUntil(this.stopLoad$),
                 takeUntilDestroyed(this.destroyRef),
@@ -446,5 +446,118 @@ export class HomeComponent {
             }
         });
     }
-    
+
+
+    canStartInsertProducts(batch: BatchDashboardItem): boolean {
+        return (
+            this.getDownloadProgress(batch) === 100 &&
+            batch.magento.insertProducts.status !== 1
+        );
+    }
+
+    canStartUpdateProducts(batch: BatchDashboardItem): boolean {
+        return (
+            this.getDownloadProgress(batch) === 100 &&
+            batch.magento.updateProducts.status !== 1
+        );
+    }
+
+    canStartInsertImages(batch: BatchDashboardItem): boolean {
+        return (
+            batch.magento.insertProducts.status === 2 &&
+            batch.magento.insertImages.status !== 1
+        );
+    }
+
+    canFinalize(batch: BatchDashboardItem): boolean {
+
+        // solo import prodotti
+        if (batch.type === 1) {
+            return (
+                batch.magento.insertProducts.status === 2
+                || batch.magento.insertProducts.total === 0
+            );
+        }
+
+        // solo update giacenze
+        if (batch.type === 2) {
+            return (
+                batch.magento.updateProducts.status === 2
+                || batch.magento.updateProducts.total === 0
+            );
+        }
+
+        // solo immagini
+        if (batch.type === 3) {
+            return (
+                batch.magento.insertImages.status === 2
+                || batch.magento.insertImages.total === 0
+            );
+        }
+
+        // completo
+        return (
+            (
+                batch.magento.insertProducts.status === 2 ||
+                batch.magento.insertProducts.total === 0
+            )
+            &&
+            (
+                batch.magento.insertImages.status === 2 ||
+                batch.magento.insertImages.total === 0
+            )
+        ) || this.earlyClosing;
+    }        
+
+
+    hasMagentoStarted(batch: BatchDashboardItem): boolean {
+        return (
+            batch.magento.insertProducts.status > 0 ||
+            batch.magento.updateProducts.status > 0 ||
+            batch.magento.insertImages.status > 0
+        );
+    }
+
+    getDownloadProgress(batch: BatchDashboardItem): number {
+        const total =
+            batch.magento.totalMagentoProducts ?? 0;
+
+        const downloaded =
+            batch.magento.downloadedMagentoProducts ?? 0;
+
+        // se Magento non è ancora partito
+        if (!this.hasMagentoStarted(batch)) {
+            return 0;
+        }
+
+        // 0/0 ma step partito => 100
+        if (total === 0 && downloaded === 0) {
+            return 100;
+        }
+
+        if (total === 0) {
+            return 0;
+        }
+
+        return Number(
+            ((downloaded / total) * 100).toFixed(2)
+        );
+    }
+
+    isReindexRunning(batch: BatchDashboardItem): boolean {
+        return this.reindexMap[batch.batchId]?.running === true;
+    }
+
+
+    showInsertProducts(batch: BatchDashboardItem): boolean {
+        return batch.type === 0 || batch.type === 1;
+    }
+
+    showUpdateQty(batch: BatchDashboardItem): boolean {
+        return batch.type === 2;
+    }
+
+    showInsertImages(batch: BatchDashboardItem): boolean {
+        return batch.type === 0 || batch.type === 3;
+    }
 }

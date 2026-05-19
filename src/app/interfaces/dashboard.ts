@@ -30,18 +30,26 @@ export interface StepMetrics {
 
 export interface StepMetricsMagento {
   totalMagentoProducts: number;
-  totalDownloadMagentoProducts: number;
+  downloadedMagentoProducts: number;
+
+  progressTotal: number;
+
+  hasInsertProducts: boolean;
+  hasInsertImages: boolean;
+  hasUpdateQty: boolean;
+
+  insertProducts: MagentoStep;
+  updateProducts: MagentoStep;
+  insertImages: MagentoStep;
+}
+
+export interface MagentoStep {
   total: number;
-  success: number;
-  insert: number;
-  updatePrice: number;
-  insertImages: number;
+  processed: number;
+  pending: number;
   errors: number;
+  status: number; // OperationsStatus
   progress: number;
-  progressDownload: number;
-  progressInsert: number;
-  progressUpdatePrice: number;
-  progressInsertImages: number;
 }
 
 export interface ReindexStatus {
