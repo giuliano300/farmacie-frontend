@@ -505,9 +505,6 @@
   font-weight: 500;
 }
 
-.mdc-linear-progress{
-  max-width: 85%;
-}
 
 .restart{
   font-size: 10px;
@@ -614,4 +611,20 @@ h4{
     background: rgba(255,255,255,0.5);
     color: var(--primaryColor);
     font-size: 18px;
+}
+
+.mdc-linear-progress{
+  max-width: 85%;
+}
+
+::ng-deep .mat-progress-red .mdc-linear-progress__bar-inner {
+    border-color: #f76a68 !important;
+}
+
+::ng-deep .mat-progress-orange .mdc-linear-progress__bar-inner {
+    border-color: #fdcc63 !important;
+}
+
+::ng-deep .mat-progress-green .mdc-linear-progress__bar-inner {
+    border-color: #71ac74  !important;
 }

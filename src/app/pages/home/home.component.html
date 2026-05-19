@@ -59,7 +59,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="element.heronImport.progress"
-                                    [color]="getColor(element.heronImport.progress)">
+                                    [color]="getProgressClass(element.heronImport.progress)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -79,7 +79,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="element.farmadati.progress"
-                                    [color]="getColor(element.farmadati.progress)">
+                                    [color]="getProgressClass(element.farmadati.progress)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -103,7 +103,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="element.suppliers.progress"
-                                    [color]="getColor(element.suppliers.progress)">
+                                    [color]="getProgressClass(element.suppliers.progress)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -148,7 +148,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="getDownloadProgress(element)"
-                                    [color]="getColor(getDownloadProgress(element))">
+                                    [color]="getProgressClass(getDownloadProgress(element))">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -168,9 +168,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="element.magento.insertProducts.progress"
-                                    [color]="getColor(
-                                        element.magento.insertProducts.progress
-                                    )">
+                                    [color]="getProgressClass(element.magento.insertProducts.progress)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -190,9 +188,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="element.magento.updateProducts.progress"
-                                    [color]="getColor(
-                                        element.magento.updateProducts.progress
-                                    )">
+                                    [color]="getProgressClass(element.magento.updateProducts.progress)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -219,9 +215,7 @@
                                 <mat-progress-bar
                                     mode="determinate"
                                     [value]="element.magento.insertImages.progress"
-                                    [color]="getColor(
-                                        element.magento.insertImages.progress
-                                    )">
+                                    [color]="getProgressClass(element.magento.insertImages.progress)">
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
@@ -242,23 +236,12 @@
 
                                         <mat-progress-bar
                                             mode="determinate"
-                                            [value]="
-                                                reindexMap[element.batchId]?.percent
-                                            "
-                                            [color]="
-                                                getColor(
-                                                    reindexMap[
-                                                        element.batchId
-                                                    ]?.percent || 0
-                                                )
-                                            ">
+                                            [value]="element.reindexValues.percent"
+                                            [color]="getProgressClass(+element.reindexValues.percent)">
                                         </mat-progress-bar>
 
                                         <span class="progress-text">
-                                            {{
-                                                reindexMap[element.batchId]
-                                                    ?.percent ?? 0
-                                            }}%
+                                            {{element.reindexValues.percent ?? 0}}%
                                         </span>
 
                                     </span>

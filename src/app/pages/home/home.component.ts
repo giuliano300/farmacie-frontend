@@ -95,7 +95,7 @@ export class HomeComponent {
 
     getLoad() {
 
-        timer(0, 500)
+        timer(0, 3000) // ogni 3 secondi
             .pipe(
                 takeUntil(this.stopLoad$),
                 takeUntilDestroyed(this.destroyRef),
@@ -107,21 +107,6 @@ export class HomeComponent {
                 ),
 
                 tap(x => {
-
-                    x.activeBatches = x.activeBatches.map(batch => ({
-
-                        ...batch,
-
-                        reindexValues:
-                            this.reindexMap[batch.batchId] ??
-                            {
-                                percent: 0,
-                                running: false,
-                                processed: 0,
-                                total: 0
-                            }
-                    }));
-
                     this.dashobardItem = x.activeBatches;
 
                     this.dataSource.data = this.dashobardItem;
@@ -135,17 +120,17 @@ export class HomeComponent {
             .subscribe();
     }
 
-    getColor(progress: number): 'primary' | 'accent' | 'warn' {
 
-        if (progress < 40) {
-            return 'warn';       // rosso
+    getProgressClass(percent: number): string {
+        if (percent < 30) {
+            return 'progress-red';
         }
 
-        if (progress < 80) {
-            return 'accent';     // arancione
+        if (percent < 100) {
+            return 'progress-orange';
         }
 
-        return 'primary';      // blue
+        return 'progress-green';
     }
 
     deleteBatch(b: any){
