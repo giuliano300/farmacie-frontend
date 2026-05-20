@@ -618,51 +618,99 @@ h4{
 }
 
 ::ng-deep .mat-progress-red .mdc-linear-progress__bar-inner {
-    border-top-width: 4px !important;
+    border-top: 4px solid transparent !important;
     border-image: linear-gradient(
         90deg,
         #ff9a9a 0%,
         #f76a68 50%,
         #d93636 100%
     ) 1 !important;
+    box-shadow:
+        0 0 6px rgba(247, 106, 104, 0.6),
+        0 0 12px rgba(247, 106, 104, 0.35);
 }
 
 ::ng-deep .mat-progress-yellow .mdc-linear-progress__bar-inner {
-    border-top-width: 4px !important;
+    border-top: 4px solid transparent !important;
     border-image: linear-gradient(
         90deg,
         #fff89a 0%,
         #e2f01d 50%,
         #c9d400 100%
     ) 1 !important;
+    box-shadow:
+        0 0 6px rgba(226, 240, 29, 0.6),
+        0 0 12px rgba(226, 240, 29, 0.35);
 }
 
 ::ng-deep .mat-progress-orange .mdc-linear-progress__bar-inner {
-    border-top-width: 4px !important;
+    border-top: 4px solid transparent !important;
     border-image: linear-gradient(
         90deg,
         #ffd39a 0%,
         #fcb447 50%,
         #f28b00 100%
     ) 1 !important;
+    box-shadow:
+        0 0 6px rgba(252, 180, 71, 0.6),
+        0 0 12px rgba(252, 180, 71, 0.35);
 }
 
 ::ng-deep .mat-progress-gold .mdc-linear-progress__bar-inner {
-    border-top-width: 4px !important;
+    border-top: 4px solid transparent !important;
     border-image: linear-gradient(
         90deg,
         #ffcf85 0%,
         #e9830e 50%,
         #b85c00 100%
     ) 1 !important;
+    box-shadow:
+        0 0 6px rgba(233, 131, 14, 0.6),
+        0 0 12px rgba(233, 131, 14, 0.35);
 }
 
+/* GREEN = solo sfumatura */
 ::ng-deep .mat-progress-green .mdc-linear-progress__bar-inner {
-    border-top-width: 4px !important;
+    border-top: 4px solid transparent !important;
     border-image: linear-gradient(
         90deg,
         #a8dba8 0%,
         #71ac74 50%,
         #3e7b43 100%
     ) 1 !important;
+    box-shadow: none !important;
+}
+
+/* shine su tutti tranne green */
+::ng-deep .mat-progress-red .mdc-linear-progress__primary-bar,
+::ng-deep .mat-progress-yellow .mdc-linear-progress__primary-bar,
+::ng-deep .mat-progress-orange .mdc-linear-progress__primary-bar,
+::ng-deep .mat-progress-gold .mdc-linear-progress__primary-bar {
+    position: relative;
+    overflow: hidden;
+}
+
+::ng-deep .mat-progress-red .mdc-linear-progress__primary-bar::after,
+::ng-deep .mat-progress-yellow .mdc-linear-progress__primary-bar::after,
+::ng-deep .mat-progress-orange .mdc-linear-progress__primary-bar::after,
+::ng-deep .mat-progress-gold .mdc-linear-progress__primary-bar::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -40%;
+    width: 35%;
+    height: 8px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,0.75),
+        transparent
+    );
+    filter: blur(2px);
+    animation: progressGlow 1.4s linear infinite;
+}
+
+@keyframes progressGlow {
+    0% { left: -40%; }
+    100% { left: 120%; }
 }
