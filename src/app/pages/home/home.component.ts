@@ -126,8 +126,16 @@ export class HomeComponent {
             return 'progress-red';
         }
 
-        if (percent < 100) {
+        if (percent < 60) {
+            return 'progress-yellow';
+        }
+
+        if (percent < 90) {
             return 'progress-orange';
+        }
+
+        if (percent < 100) {
+            return 'progress-gold';
         }
 
         return 'progress-green';
@@ -499,7 +507,8 @@ export class HomeComponent {
         return (
             batch.magento.insertProducts.status > 0 ||
             batch.magento.updateProducts.status > 0 ||
-            batch.magento.insertImages.status > 0
+            batch.magento.insertImages.status > 0 ||
+            batch.magento.totalMagentoProducts > 0
         );
     }
 

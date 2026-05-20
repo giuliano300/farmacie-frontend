@@ -618,13 +618,51 @@ h4{
 }
 
 ::ng-deep .mat-progress-red .mdc-linear-progress__bar-inner {
-    border-color: #f76a68 !important;
+    border-top-width: 4px !important;
+    border-image: linear-gradient(
+        90deg,
+        #ff9a9a 0%,
+        #f76a68 50%,
+        #d93636 100%
+    ) 1 !important;
+}
+
+::ng-deep .mat-progress-yellow .mdc-linear-progress__bar-inner {
+    border-top-width: 4px !important;
+    border-image: linear-gradient(
+        90deg,
+        #fff89a 0%,
+        #e2f01d 50%,
+        #c9d400 100%
+    ) 1 !important;
 }
 
 ::ng-deep .mat-progress-orange .mdc-linear-progress__bar-inner {
-    border-color: #fdcc63 !important;
+    border-top-width: 4px !important;
+    border-image: linear-gradient(
+        90deg,
+        #ffd39a 0%,
+        #fcb447 50%,
+        #f28b00 100%
+    ) 1 !important;
+}
+
+::ng-deep .mat-progress-gold .mdc-linear-progress__bar-inner {
+    border-top-width: 4px !important;
+    border-image: linear-gradient(
+        90deg,
+        #ffcf85 0%,
+        #e9830e 50%,
+        #b85c00 100%
+    ) 1 !important;
 }
 
 ::ng-deep .mat-progress-green .mdc-linear-progress__bar-inner {
-    border-color: #71ac74  !important;
+    border-top-width: 4px !important;
+    border-image: linear-gradient(
+        90deg,
+        #a8dba8 0%,
+        #71ac74 50%,
+        #3e7b43 100%
+    ) 1 !important;
 }
