@@ -205,24 +205,33 @@
                                     Inserimento immagini
                                     <br>
 
-                                    <small>
+                                    <small *ngIf="showWaitingInsertImages(element)">
                                         Possono trascorrere alcuni minuti
                                         <br>
                                         prima dell'inizio dell'import
                                     </small>
                                 </div>
 
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.magento.insertImages.progress"
-                                    [color]="getProgressClass(element.magento.insertImages.progress)">
-                                </mat-progress-bar>
+                                <!-- SPINNER finché non parte -->
+                                <div class="waiting-spinner" *ngIf="showWaitingInsertImages(element)">
+                                    <div class="loader"></div>
+                                    <span>Preparazione file per<br>inserimento immagini...</span>
+                                </div>
 
-                                <span class="progress-text">
-                                    {{ element.magento.insertImages.progress }}%
-                                </span>
+                                <!-- PROGRESS BAR quando parte -->
+                                <ng-container *ngIf="!showWaitingInsertImages(element)">
+                                    <mat-progress-bar
+                                        mode="determinate"
+                                        [value]="getValueProgressImages(element.magento.insertImages.progress)"
+                                        [color]="getProgressClass(getValueProgressImages(element.magento.insertImages.progress))">
+                                    </mat-progress-bar>
+
+                                    <span class="progress-text">
+                                        {{ getValueProgressImages(element.magento.insertImages.progress) }}%
+                                    </span>
+                                </ng-container>
+
                             </div>
-
                             <!-- REINDEX -->
                             <div class="progress-container">
 

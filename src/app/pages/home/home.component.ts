@@ -14,7 +14,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { StepService } from '../../services/step.service';
 import { runStepRequest } from '../../interfaces/runStepRequest';
-import { AlertDialogComponent } from '../../alert-dialog/alert-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MagentoService } from '../../services/magento.service';
 import { BatchesService } from '../../services/batches.service';
@@ -23,6 +22,8 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CompleteBatchesItem } from '../../interfaces/CompleteBatchesItem';
 import { AddBatchDialogComponent } from '../../add-batch-dialog/add-batch-dialog.component';
+
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import {
     Subject,
@@ -48,7 +49,8 @@ import {
     CommonModule,
     MatProgressBarModule,
     MatCardModule,
-    MatTooltip
+    MatTooltip,
+    MatProgressSpinnerModule
 ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
@@ -538,8 +540,8 @@ export class HomeComponent {
         );
     }
 
-    isReindexRunning(batch: BatchDashboardItem): boolean {
-        return this.reindexMap[batch.batchId]?.running === true;
+    isReindexRunning(element: BatchDashboardItem): boolean {
+        return element.reindexValues.percent > 99 ? true : false;
     }
 
 
@@ -553,5 +555,27 @@ export class HomeComponent {
 
     showInsertImages(batch: BatchDashboardItem): boolean {
         return batch.type === 0 || batch.type === 3;
+    }
+
+    getValueProgressImages(percent: number): number {
+
+        if (percent > 95) {
+            return 100;
+        }
+
+        return percent;
+    }
+
+
+    showWaitingInsertImages(element: any): boolean {
+        const downloadCompleted =
+            this.getDownloadProgress(element) === 100;
+
+        const progress =
+            element?.batch?.type === 0
+                ? (element?.magento?.insertProducts?.progress ?? 0)
+                : (element?.magento?.insertImages?.progress ?? 0);
+
+        return downloadCompleted && progress === 0;
     }
 }
