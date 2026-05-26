@@ -21,6 +21,7 @@ export interface customers {
   heronFtp: string;
   heronUsername: string;
   heronPassword: string;
+  cron: string;
   active: boolean;
   msi: boolean;
   ivaInclusive: boolean;

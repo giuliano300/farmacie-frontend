@@ -13,7 +13,7 @@
         </div>
 
         <!-- Ragione sociale -->
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <label class="label d-block fw-medium mb-10"> Nome </label>
           <mat-form-field class="w-100">
             <i-feather name="home"></i-feather>
@@ -22,13 +22,37 @@
           </mat-form-field>
         </div>
 
-        <!-- Partita IVA -->
-        <div class="col-sm-6">
+        <!-- Codice store magento -->
+        <div class="col-sm-4">
           <label class="label d-block fw-medium mb-10">Codice store magento</label>
           <mat-form-field class="w-100">
             <i-feather name="code"></i-feather>
             <mat-label>Codice store magento</mat-label>
             <input matInput formControlName="magentoStoreCode" type="text">
+          </mat-form-field>
+        </div>
+
+        <!-- Cron -->
+        <div class="col-sm-4">
+          <label class="label d-block fw-medium mb-10">
+            Cron (seleziona uno o più orari)
+          </label>
+
+          <mat-form-field class="w-100">
+            <i-feather name="Clock"></i-feather>
+            <mat-label>Cron</mat-label>
+
+            <mat-select
+              formControlName="cron"
+              multiple
+            >
+              <mat-option
+                *ngFor="let time of timeSlots"
+                [value]="time"
+              >
+                {{ time }}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
         </div>
 

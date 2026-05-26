@@ -55,6 +55,8 @@ export class AddCustomerComponent {
 
   id: string | null = null;
 
+  timeSlots: string[] = [];
+
   constructor(
       private router: Router,
       private customerService: CustomersService,
@@ -81,13 +83,14 @@ export class AddCustomerComponent {
       active: ['', [Validators.required]],
       msi: ['', [Validators.required]],
       ivaInclusive: [false, [Validators.required]],
+      cron: [['0:00'], [Validators.required]],
       id: ['']
     });
 
   }
 
   ngOnInit(): void {
-
+    this.generateTimeSlots();
     this.route.paramMap.subscribe(params => {
       this.id = params.get('id');
 
@@ -96,6 +99,15 @@ export class AddCustomerComponent {
 
         this.customerService.getCustomer(this.id)
           .subscribe((data: customerWithBatchStatus) => {
+
+          const cronValues =
+            data.customer.cron
+              ? data.customer.cron
+                  .split(';')
+                  .map(x => x.trim())
+                  .filter(x => x)
+              : [];
+
             this.customerForm.patchValue({
               name: data.customer.name,
               magentoStoreCode: data.customer.magentoStoreCode,
@@ -113,6 +125,7 @@ export class AddCustomerComponent {
               magentoRootPath: data.customer.magento.magentoRootPath,
               active: data.customer.active,
               ivaInclusive: data.customer.ivaInclusive,
+              cron: cronValues,
               id: this.id,
             });
           });
@@ -130,6 +143,11 @@ export class AddCustomerComponent {
     if (this.customerForm.valid) {
       const formValue = this.customerForm.value;
 
+      const cronValue =
+        Array.isArray(formValue.cron)
+          ? formValue.cron.join(';')
+          : formValue.cron ?? '';
+
       const w: customers = {
         id: '',
         code: formValue.magentoStoreCode,
@@ -142,7 +160,8 @@ export class AddCustomerComponent {
         heronPassword: formValue.heronPassword,
         active: formValue.active ?? true,
         msi: formValue.msi ?? true,
-        ivaInclusive: formValue.ivaInclusive ?? false,
+        ivaInclusive: formValue.ivaInclusive ?? false,  
+        cron: cronValue,
         createdAt: new Date(),
         magento: {
           baseUrl: formValue.baseUrl,
@@ -185,6 +204,17 @@ export class AddCustomerComponent {
     else 
     {
       console.warn('Form non valido');
+    }
+  }
+
+  generateTimeSlots(): void {
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const h = hour.toString().padStart(2, '0');
+        const m = minute.toString().padStart(2, '0');
+
+        this.timeSlots.push(`${h}:${m}`);
+      }
     }
   }
 }
