@@ -80,6 +80,8 @@ export class AddCustomerComponent {
       ftpPassword: ['', [Validators.required]],
       ftpImportPath: ['', [Validators.required]],
       magentoRootPath: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
       active: ['', [Validators.required]],
       msi: ['', [Validators.required]],
       ivaInclusive: [false, [Validators.required]],
@@ -127,6 +129,8 @@ export class AddCustomerComponent {
               ivaInclusive: data.customer.ivaInclusive,
               cron: cronValues,
               id: this.id,
+              email: data.customer.email,
+              password: data.customer.password,
             });
           });
       }
@@ -162,6 +166,8 @@ export class AddCustomerComponent {
         msi: formValue.msi ?? true,
         ivaInclusive: formValue.ivaInclusive ?? false,  
         cron: cronValue,
+        email: formValue.email,
+        password: formValue.password,
         createdAt: new Date(),
         magento: {
           baseUrl: formValue.baseUrl,
