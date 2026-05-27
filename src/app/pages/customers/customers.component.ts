@@ -20,6 +20,7 @@ import { BatchesService } from '../../services/batches.service';
 import { StepService } from '../../services/step.service';
 import { runStepRequest } from '../../interfaces/runStepRequest';
 import { MatProgressBar } from "@angular/material/progress-bar";
+import { MagentoService } from '../../services/magento.service';
 
 @Component({
     selector: 'app-customers',
@@ -30,7 +31,7 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 export class CustomersComponent {
 
     customers: customerWithBatchStatus[] = []; 
-    displayedColumns: string[] = ['name', 'magentoStoreCode', 'msi', 'active', 'products', 'categories', 'suppliers', 'batches', 'create', 'action'];
+    displayedColumns: string[] = ['name', 'magentoStoreCode', 'msi', 'active', 'products', 'categories', 'suppliers', 'batches', 'create', 'delete', 'action'];
     dataSource = new MatTableDataSource<customerWithBatchStatus>(this.customers);
     firstLoading: boolean = true;
 
@@ -39,6 +40,7 @@ export class CustomersComponent {
       private customersService: CustomersService, 
       private batchesService: BatchesService, 
       private stepService: StepService, 
+      private magentoService: MagentoService,
       private router: Router) {}
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -62,6 +64,7 @@ export class CustomersComponent {
             this.customers = data.map(customer => ({
                 ...customer, 
                 create:'ri-play-fill',
+                delete: 'ri-close-line',
                 products: 'ri-search-line',
                 categories: 'ri-search-line',
                 suppliers: 'ri-search-line',
@@ -90,6 +93,35 @@ export class CustomersComponent {
 
     getToProductsToExclude(id:string){
        this.router.navigate(['/customer/products-to-exclude', id]);
+    }
+
+    DeleteProducts(customer: any){
+      const data = {
+        title: "Vuoi eliminare tutti i prodotti di questo cliente?",
+        description: "Questa operazione eliminerà tutti i prodotti associati dallo store di questo cliente. Sei sicuro di voler procedere?",
+        btnDeleteText: "Elimina prodotti"
+      };
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '500px',
+        data: data
+     });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.firstLoading = true;
+        this.magentoService.deleteProducts(customer.id!)
+          .subscribe((data: boolean) => {
+            if(data){
+              this.getCustomers();
+              this.firstLoading = false;
+            }
+          });
+      } 
+      else 
+      {
+        console.log("Close");
+      }
+    });
     }
 
 
@@ -155,8 +187,8 @@ export class CustomersComponent {
 
    getTooltip(element: any): string {
       return this.isEnabled(element)
-        ? 'Crea batch'
-        : 'Batch già in esecuzione';
+        ? 'crea batch'
+        : 'batch già in esecuzione';
     }
 
    updateCustomer(id:string){
