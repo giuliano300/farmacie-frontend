@@ -13,18 +13,6 @@
                 <table mat-table [dataSource]="dataSource">
 
                     <!-- Name Column -->
-                    <ng-container matColumnDef="customerId">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
-                            Cliente
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Cliente">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{element.customer!.name}}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
                     <ng-container matColumnDef="startedAt">
                         <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
                             Data inizio
@@ -32,7 +20,19 @@
                         <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Data inizio">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                   {{ element.farmadatiUpdate!.startedAt | date:'dd/MM/yyyy HH:mm' }}
+                                   {{ element!.startedAt | date:'dd/MM/yyyy HH:mm' }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
+                            Stato
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Stato">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                   {{ element!.status }}
                                 </h6>
                             </div>
                         </td>
@@ -52,14 +52,26 @@
                             </div>
                         </td>
                     </ng-container>
-                    <ng-container matColumnDef="endedAt">
+                    <ng-container matColumnDef="durata">
                         <th mat-header-cell *matHeaderCellDef class="pl-0 mini2">
-                            Data fine
+                             Durata
                         </th>
                         <td mat-cell *matCellDef="let element" class="pl-0 mini2" data-label="Data fine">
                             <div class="position-relative">
                                 <h6 class="mt-0 mb-0">
-                                   {{ element.farmadatiUpdate!.endedAt == null ? '' : element.farmadatiUpdate!.endedAt | date:'dd/MM/yyyy HH:mm'}}
+                                   {{ getDurataImport(element) }}
+                                </h6>
+                            </div>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="endedAt">
+                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini2">
+                             Data fine
+                        </th>
+                        <td mat-cell *matCellDef="let element" class="pl-0 mini2" data-label="Data fine">
+                            <div class="position-relative">
+                                <h6 class="mt-0 mb-0">
+                                   {{ element!.endedAt == null ? '-' : element!.endedAt | date:'dd/MM/yyyy HH:mm'}}
                                 </h6>
                             </div>
                         </td>

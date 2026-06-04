@@ -8,7 +8,6 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { suppliers } from '../../interfaces/supplier';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatTooltip } from "@angular/material/tooltip";
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
@@ -18,8 +17,6 @@ import { FarmadatiUpdates } from '../../interfaces/Farmadati-updates';
 import { FarmadatiUpdatesService } from '../../services/farmadati-updates.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, switchMap, timer } from 'rxjs';
-import { AddCustomerDialogComponent } from '../../add-customer-dialog/add-customer-dialog.component';
-import { FarmadatiUpdatesWithCustomer } from '../../interfaces/Farmadati-updates-with-customer';
 
 @Component({
     selector: 'app-farmadati',
@@ -29,9 +26,9 @@ import { FarmadatiUpdatesWithCustomer } from '../../interfaces/Farmadati-updates
 })
 export class FarmadatiComponent {
 
-    farmadatiUpdates: FarmadatiUpdatesWithCustomer[] = []; 
-    displayedColumns: string[] = ['customerId', 'startedAt', 'progress', 'endedAt', 'action'];
-    dataSource = new MatTableDataSource<FarmadatiUpdatesWithCustomer>(this.farmadatiUpdates);
+    farmadatiUpdates: FarmadatiUpdates[] = []; 
+    displayedColumns: string[] = ['startedAt', 'status', 'progress','durata', 'endedAt', 'action'];
+    dataSource = new MatTableDataSource<FarmadatiUpdates>(this.farmadatiUpdates);
     constructor(private dialog: MatDialog, private farmadatiUpdatesService: FarmadatiUpdatesService, private router: Router, private destroyRef: DestroyRef) {}
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -43,7 +40,7 @@ export class FarmadatiComponent {
     }
 
     ngOnInit(): void {
-      timer(0, 2500)
+      timer(0, 1000)
         .pipe(
             takeUntilDestroyed(this.destroyRef),
             filter(() => document.visibilityState === 'visible'),
@@ -53,35 +50,37 @@ export class FarmadatiComponent {
     }
 
     getFarmadati(){
-      this.farmadatiUpdatesService.get().subscribe((data: FarmadatiUpdatesWithCustomer[]) => {
+      this.farmadatiUpdatesService.get().subscribe((data: FarmadatiUpdates[]) => {
           // Aggiungi la proprietà action a ogni categoria esistente
           this.farmadatiUpdates = data
-            .sort((a, b) => new Date(b.farmadatiUpdate!.startedAt!).getTime() - new Date(a.farmadatiUpdate!.startedAt!).getTime())
+            .sort((a, b) => new Date(b!.startedAt!).getTime() - new Date(a!.startedAt!).getTime())
             .map(f => ({              
               ...f, 
               progress: '',
+              durata: '',
               action: {
                   delete: 'ri-delete-bin-line'
               }
           }));
 
           //console.log(JSON.stringify(this.suppliers));
-          this.dataSource = new MatTableDataSource<FarmadatiUpdatesWithCustomer>(this.farmadatiUpdates);
+          this.dataSource = new MatTableDataSource<FarmadatiUpdates>(this.farmadatiUpdates);
           this.dataSource.paginator = this.paginator;
       });
    }
     
     start(){
-      const dialogRef = this.dialog.open(AddCustomerDialogComponent, {
-        width: '500px'
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '500px',
+        data: {
+          title: "CONFERMA IMPORTAZIONE",
+          description: "Sei sicuro di voler importare i dati da Farmadati? L'importazione potrebbe richiedere diversi minuti.",
+          btnDeleteText: "Importa",
+        }
       });
-
       dialogRef.afterClosed().subscribe((result: any) => {
         if (result) {
-          const f: FarmadatiUpdates = {
-            customerId: result.customerId
-          };
-          this.farmadatiUpdatesService.create(f).subscribe((data)=>{
+          this.farmadatiUpdatesService.create().subscribe((data)=>{
             this.getFarmadati();
           })        
         } 
@@ -93,7 +92,7 @@ export class FarmadatiComponent {
 
     }
       
-    DeleteItem(item:FarmadatiUpdatesWithCustomer){
+    DeleteItem(item:FarmadatiUpdates){
 
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         width: '500px'
@@ -101,7 +100,7 @@ export class FarmadatiComponent {
 
       dialogRef.afterClosed().subscribe((result: any) => {
         if (result) {
-          this.farmadatiUpdatesService.delete(item.farmadatiUpdate!.id!)
+          this.farmadatiUpdatesService.delete(item!.id!)
             .subscribe((data: boolean) => {
               if(data){
                 this.getFarmadati();
@@ -115,11 +114,27 @@ export class FarmadatiComponent {
       });
     }
 
-    getProgressBarValue(element: FarmadatiUpdatesWithCustomer){
-      if(element.farmadatiUpdate!.productNumber == 0)
-        return 100;
+    getProgressBarValue(element: FarmadatiUpdates){
+      if(element!.productNumber == 0)
+        return 0;
 
-      const total = !element.farmadatiUpdate!.productNumber ? 0 : element.farmadatiUpdate!.productWorked! / element.farmadatiUpdate!.productNumber! * 100;
+      const total = !element!.productNumber ? 0 : element!.productWorked! / element!.productNumber! * 100;
       return  total.toFixed(2);
+    }
+
+    getDurataImport(element: FarmadatiUpdates){
+      if(element!.startedAt == null)
+        return '';    
+
+      const start = new Date(element!.startedAt!);
+      let now = new Date();
+      const diff = Math.abs(now.getTime() - start.getTime());
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+
+      if(element!.endedAt != null)
+        now = new Date(element!.endedAt!);
+
+      return `${minutes} m ${seconds} s`;
     }
 }

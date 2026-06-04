@@ -14,12 +14,12 @@ export class FarmadatiUpdatesService {
     
     constructor(private http: HttpClient) {}
 
-    get():Observable<FarmadatiUpdatesWithCustomer[]>{
-      return this.http.get<FarmadatiUpdatesWithCustomer[]>(this.apiUrl);
+    get():Observable<FarmadatiUpdates[]>{
+      return this.http.get<FarmadatiUpdates[]>(this.apiUrl);
     }
 
-    create(farmadatiUpdates: FarmadatiUpdates){
-      return this.http.post(this.apiUrl, farmadatiUpdates);
+    create(){
+      return this.http.post(this.apiUrl + "/import-full", null);
     }
 
     delete(id: string):Observable<boolean>{
