@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>{{title}}</h1>
+<form [formGroup] = "categoryForm">
+  <mat-card class="trinta-card mb-10 bg-white border-none d-block">
+    <mat-card-content>
+      <div class="row g-3"> 
+        <div class="col-sm-12">
+          <label class="label d-block fw-medium mb-10">Seleziona un tipo di importazione</label>
+          <mat-form-field class="w-100">
+            <i-feather name="command"></i-feather>
+            <mat-label>Seleziona un tipo di importazione</mat-label>
+            <mat-select formControlName="type">
+              <mat-option value="1">Tutte le operazioni</mat-option>
+              <mat-option value="1">Inserimento solo prodotti</mat-option>
+              <mat-option value="2">Inserimento prodotti e descrizioni</mat-option>
+              <mat-option value="3">Inserimento prodotti e codice macro</mat-option>
+              <mat-option value="4">Inserimento prodotti e immagini</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</form>
+<mat-dialog-actions>
+  <button mat-button (click)="onClose()" class="btn back">Chiudi</button>
+  <button mat-flat-button (click)="onSave()" class="btn" [disabled]="categoryForm.invalid">Avvia</button>
+</mat-dialog-actions>

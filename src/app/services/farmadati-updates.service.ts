@@ -18,8 +18,8 @@ export class FarmadatiUpdatesService {
       return this.http.get<FarmadatiUpdates[]>(this.apiUrl);
     }
 
-    create(){
-      return this.http.post(this.apiUrl + "/import-full", null);
+    create(type: number):Observable<any>{
+      return this.http.post(this.apiUrl + "/import-full?importType=" + type, null);
     }
 
     delete(id: string):Observable<boolean>{

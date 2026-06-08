@@ -17,6 +17,7 @@ import { FarmadatiUpdates } from '../../interfaces/Farmadati-updates';
 import { FarmadatiUpdatesService } from '../../services/farmadati-updates.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, switchMap, timer } from 'rxjs';
+import { AddFarmadatiDialogComponent } from '../../add-farmadati-dialog/add-farmadati-dialog.component';
 
 @Component({
     selector: 'app-farmadati',
@@ -70,19 +71,15 @@ export class FarmadatiComponent {
    }
     
     start(){
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      const dialogRef = this.dialog.open(AddFarmadatiDialogComponent, {
         width: '500px',
-        data: {
-          title: "CONFERMA IMPORTAZIONE",
-          description: "Sei sicuro di voler importare i dati da Farmadati? L'importazione potrebbe richiedere diversi minuti.",
-          btnDeleteText: "Importa",
-        }
       });
       dialogRef.afterClosed().subscribe((result: any) => {
         if (result) {
-          this.farmadatiUpdatesService.create().subscribe((data)=>{
+          this.farmadatiUpdatesService.create(result.type).subscribe((data)=>{
             this.getFarmadati();
           })        
+          console.log(result);
         } 
         else 
         {
