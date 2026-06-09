@@ -125,13 +125,13 @@ export class FarmadatiComponent {
 
       const start = new Date(element!.startedAt!);
       let now = new Date();
-      const diff = Math.abs(now.getTime() - start.getTime());
-      const minutes = Math.floor(diff / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-
       if(element!.endedAt != null)
         now = new Date(element!.endedAt!);
 
+      const diff = Math.abs(now.getTime() - start.getTime());
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+ 
       return `${minutes} m ${seconds} s`;
     }
 }
