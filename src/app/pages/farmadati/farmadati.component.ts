@@ -119,19 +119,26 @@ export class FarmadatiComponent {
       return  total.toFixed(2);
     }
 
-    getDurataImport(element: FarmadatiUpdates){
-      if(element!.startedAt == null)
-        return '';    
+  getDurataImport(element: FarmadatiUpdates) {
+    if (element?.startedAt == null)
+      return '';
 
-      const start = new Date(element!.startedAt!);
-      let now = new Date();
-      if(element!.endedAt != null)
-        now = new Date(element!.endedAt!);
+    const start = new Date(element.startedAt);
+    let end = new Date();
 
-      const diff = Math.abs(now.getTime() - start.getTime());
-      const minutes = Math.floor(diff / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
- 
-      return `${minutes} m ${seconds} s`;
+    if (element.endedAt != null)
+      end = new Date(element.endedAt);
+
+    const diff = Math.abs(end.getTime() - start.getTime());
+
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+
+    if (hours > 0) {
+      return `${hours} h ${minutes} m ${seconds} s`;
     }
+
+    return `${minutes} m ${seconds} s`;
+  }
 }
