@@ -358,7 +358,7 @@ export class HomeComponent {
             AddBatchDialogComponent,
             {
                 width: '600px',
-                minWidth:'600px'
+                minWidth:'auto'
             });
 
         dialogRef.afterClosed().subscribe((result: any) => {
