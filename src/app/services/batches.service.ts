@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { batchStatusResponse } from '../interfaces/batchStatusResponse';
 import { CompleteBatchesItem } from '../interfaces/CompleteBatchesItem';
+import { PagedResult } from '../interfaces/PagedResult';
 
 @Injectable({
   providedIn: 'root'
@@ -31,8 +32,10 @@ export class BatchesService {
       return this.http.post<batchStatusResponse>(this.apiUrl + "/status/" + customerId, null);
     }
 
-    history(customerId: string):Observable<CompleteBatchesItem[]>{
-      return this.http.get<CompleteBatchesItem[]>(this.apiUrlHistory + "/history?customerId=" + customerId);
+    history(customerId: string, pageIndex: number, pageSize: number):Observable<PagedResult<CompleteBatchesItem>>{
+      return this.http.get<PagedResult<CompleteBatchesItem>>(
+        this.apiUrlHistory + "/history?customerId=" + customerId + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize
+      );
     }
 
     today():Observable<CompleteBatchesItem[]>{
