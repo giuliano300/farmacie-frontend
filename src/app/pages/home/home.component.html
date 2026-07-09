@@ -63,7 +63,7 @@
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{element.heronImport.progress}}%
+                                    {{element.heronImport.progress > 100 ? 100 : element.heronImport.progress}}%
                                      <span class="restart" (click)="restart('HeronImport', element)" *ngIf="element.status != 2">- Avvia/Riavvia step</span>
                                 </span>
                             </div>
@@ -83,7 +83,7 @@
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{element.farmadati.progress}}%
+                                    {{element.farmadati.progress > 100 ? 100 : element.farmadati.progress}}%
                                      <span class="restart" *ngIf="element.status != 2"
                                         [class.disabled]="element.heronImport.progress < 100"
                                         (click)="element.heronImport.progress === 100 && restart('Farmadati', element)">
@@ -107,7 +107,7 @@
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{element.suppliers.progress}}%
+                                    {{element.suppliers.progress > 100 ? 100 : element.suppliers.progress}}%
                                      <span class="restart" *ngIf="element.status != 2"
                                         [class.disabled]="element.farmadati.progress < 100"
                                         (click)="element.farmadati.progress === 100 && restart('Suppliers', element)">
@@ -152,7 +152,7 @@
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{ getDownloadProgress(element) }}%
+                                    {{ getDownloadProgress(element) > 100 ? 100 : getDownloadProgress(element) }}%
                                 </span>
                             </div>
 
@@ -172,7 +172,7 @@
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{ element.magento.insertProducts.progress }}%
+                                    {{ element.magento.insertProducts.progress > 100 ? 100 : element.magento.insertProducts.progress }}%
                                 </span>
                             </div>
 
@@ -192,7 +192,7 @@
                                 </mat-progress-bar>
 
                                 <span class="progress-text">
-                                    {{ element.magento.updateProducts.progress }}%
+                                    {{ element.magento.updateProducts.progress > 100 ? 100 : element.magento.updateProducts.progress }}%
                                 </span>
                             </div>
 
@@ -227,7 +227,7 @@
                                     </mat-progress-bar>
 
                                     <span class="progress-text">
-                                        {{ getValueProgressImages(element.magento.insertImages.progress) }}%
+                                        {{ getValueProgressImages(element.magento.insertImages.progress) > 100 ? 100 : getValueProgressImages(element.magento.insertImages.progress) }}%
                                     </span>
                                 </ng-container>
 
