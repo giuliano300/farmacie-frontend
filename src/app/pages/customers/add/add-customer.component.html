@@ -92,6 +92,15 @@
           </mat-form-field>
         </div>
 
+        <div class="col-sm-4 mb-10">
+          <label class="label d-block fw-medium mb-10">Soglia disabilitazione prodotto</label>
+          <mat-form-field class="w-100">
+            <i-feather name="activity"></i-feather>
+            <mat-label>Quantita minima</mat-label>
+            <input matInput formControlName="disableProductsBelowQuantity" type="number" min="0">
+          </mat-form-field>
+        </div>
+
 
         <div class="col-md-12 mt-10">
             <h3>Dati gestionale</h3>
@@ -117,7 +126,7 @@
         <div class="col-sm-6">
           <label class="label d-block fw-medium mb-10">Password gestionale</label>
           <mat-form-field class="w-100">
-            <i-feather name="link-2"></i-feather>
+            <i-feather name="lock"></i-feather>
             <mat-label>Password gestionale</mat-label>
             <input matInput formControlName="heronPassword" type="text">
           </mat-form-field>
@@ -125,7 +134,7 @@
         <div class="col-sm-6">
           <label class="label d-block fw-medium mb-10">Folder gestionale</label>
           <mat-form-field class="w-100">
-            <i-feather name="link-2"></i-feather>
+            <i-feather name="folder"></i-feather>
             <mat-label>Folder gestionale</mat-label>
             <input matInput formControlName="heronFtpFolder" type="text">
           </mat-form-field>

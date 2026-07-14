@@ -6,22 +6,25 @@ import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { FeathericonsModule } from '../../icons/feathericons/feathericons.module';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgIf } from '@angular/common';
 import { SessionService } from '../../services/session.service';
 import { AuthAdminService } from '../../services/auth-admin.service';
 import { Login } from '../../interfaces/Login';
 import { AdministratorService } from '../../services/administrator.service';
 import { administrator } from '../../interfaces/administrator';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-sign-in',
-    imports: [MatButton, MatIconButton, FormsModule, MatFormFieldModule, MatInputModule, FeathericonsModule, MatCheckboxModule, ReactiveFormsModule, NgIf],
+    imports: [MatButton, MatIconButton, FormsModule, MatFormFieldModule, MatInputModule, FeathericonsModule, MatCheckboxModule, MatProgressSpinnerModule, ReactiveFormsModule, NgIf],
     templateUrl: './sign-in.component.html',
     styleUrl: './sign-in.component.scss',
     standalone: true
 })
 export class SignInComponent {
     isError: boolean = false;
+    isLoading: boolean = false;
     
 
     constructor(
@@ -43,21 +46,32 @@ export class SignInComponent {
     // Form
     authForm: FormGroup;
     onSubmit() {
-        if (this.authForm.valid) {
+        if (this.authForm.valid && !this.isLoading) {
+            this.isError = false;
+            this.isLoading = true;
+
             let login:Login = {
                 "email": this.authForm.value["email"],
                 "password" : this.authForm.value["password"]
             };
             
-            this.adminService.login(login).subscribe((data: administrator) => {
-                if(data == null)
-                    this.isError = true;
-                else
-                {
-                    this.authAdminService.login(data);
-                    this.router.navigate(['/home']);
+            this.adminService.login(login)
+                .pipe(finalize(() => this.isLoading = false))
+                .subscribe({
+                    next: (data: administrator) => {
+                        if(data == null)
+                            this.isError = true;
+                        else
+                        {
+                            this.authAdminService.login(data);
+                            this.router.navigate(['/home']);
+                        }
+                    },
+                    error: () => {
+                        this.isError = true;
+                    }
                 }
-            });;
+            );
             
         } else {
             console.log('Form is invalid. Please check the fields.');

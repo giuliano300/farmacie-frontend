@@ -85,6 +85,7 @@ export class AddCustomerComponent {
       active: ['', [Validators.required]],
       msi: ['', [Validators.required]],
       ivaInclusive: [false, [Validators.required]],
+      disableProductsBelowQuantity: [3, [Validators.required, Validators.min(0)]],
       cron: [['0:00'], [Validators.required]],
       id: ['']
     });
@@ -127,6 +128,7 @@ export class AddCustomerComponent {
               magentoRootPath: data.customer.magento.magentoRootPath,
               active: data.customer.active,
               ivaInclusive: data.customer.ivaInclusive,
+              disableProductsBelowQuantity: data.customer.disableProductsBelowQuantity ?? 3,
               cron: cronValues,
               id: this.id,
               email: data.customer.email,
@@ -165,6 +167,7 @@ export class AddCustomerComponent {
         active: formValue.active ?? true,
         msi: formValue.msi ?? true,
         ivaInclusive: formValue.ivaInclusive ?? false,  
+        disableProductsBelowQuantity: formValue.disableProductsBelowQuantity ?? 3,
         cron: cronValue,
         email: formValue.email,
         password: formValue.password,

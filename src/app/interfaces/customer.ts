@@ -27,6 +27,7 @@ export interface customers {
   active: boolean;
   msi: boolean;
   ivaInclusive: boolean;
+  disableProductsBelowQuantity: number;
   createdAt: Date;
   magento: MagentoConfig;
 }

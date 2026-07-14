@@ -50,8 +50,12 @@
                             Username o password errati
                         </div>
                     </div>
-                    <button mat-button type="submit" [disabled]="authForm.invalid">
-                        Accedi
+                    <button mat-button type="submit" [disabled]="authForm.invalid || isLoading">
+                        <span class="submit-content" *ngIf="!isLoading">Accedi</span>
+                        <span class="submit-content" *ngIf="isLoading">
+                            <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+                            Accesso...
+                        </span>
                     </button>
                 </form>
             </div>

@@ -197,6 +197,15 @@
                     &[disabled] {
                         background-color: #eff3f9;
                     }
+                    .submit-content {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                    }
+                    .mat-mdc-progress-spinner {
+                        --mdc-circular-progress-active-indicator-color: var(--whiteColor);
+                    }
                 }
             }
         }

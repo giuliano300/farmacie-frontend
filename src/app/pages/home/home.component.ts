@@ -554,7 +554,7 @@ export class HomeComponent {
     }
 
     showInsertImages(batch: BatchDashboardItem): boolean {
-        return batch.type === 3;
+        return batch.type === 0 || batch.type === 3;
     }
 
     getValueProgressImages(percent: number): number {
