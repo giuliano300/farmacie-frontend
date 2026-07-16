@@ -127,7 +127,7 @@
                             height: auto;
                             font: {
                                 family: var(--headingFontFamily);
-                                size: var(--fontSize);
+                                size: 13px;
                                 weight: 500;
                             };
                             padding: {
@@ -404,7 +404,7 @@
                         display: block;
                         font: {
                             family: var(--headingFontFamily);
-                            size: var(--fontSize);
+                            size: 13px;
                             weight: 500;
                         };
                         i-feather {
@@ -719,3 +719,95 @@
 
 /* Min width 1600px */
 @media only screen and (min-width: 1600px) {}
+/* Dark indigo sidebar */
+::ng-deep .sidebar-area {
+    background: linear-gradient(180deg, #18233d 0%, #10182c 100%) !important;
+    border-right: 1px solid rgba(255,255,255,.06);
+    box-shadow: 12px 0 35px rgba(16,24,44,.12);
+
+    .logo {
+        padding: 24px 24px 20px !important;
+        background: transparent !important;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        a span { color: #fff !important; font-weight: 650 !important; letter-spacing: .08em; }
+        img { filter: drop-shadow(0 4px 9px rgba(0, 0, 0, .2)); }
+    }
+
+    .burger-menu span { background: #fff !important; }
+    .ng-scrollbar .ng-scrollbar-thumb { background: rgba(255,255,255,.18) !important; border-radius: 999px !important; }
+    .sidebar-inner { padding: 92px 14px 18px !important; }
+    .sidebar-menu .sub-title { margin: 14px 12px 12px !important; padding-left: 0 !important; color: #8490aa !important; font-size: 10px; font-weight: 700; letter-spacing: .16em; }
+    .sidebar-menu .sub-title::before { display: none; }
+
+    .sidebar-menu-link,
+    .mat-expansion-panel-header {
+        color: #c6cee0 !important;
+        font-size: 13px !important;
+        min-height: 44px !important;
+        margin-bottom: 6px !important;
+        padding: 0 14px 0 44px !important;
+        border-radius: 12px !important;
+        font-weight: 550 !important;
+        line-height: 44px;
+        transition: color .18s ease, background .18s ease, transform .18s ease !important;
+
+        i-feather { left: 15px !important; width: 18px !important; height: 18px !important; color: #8490aa !important; }
+        .title,
+        .mat-expansion-panel-header-title { color: inherit !important; }
+
+        &:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,.07) !important;
+            transform: translateX(2px);
+            i-feather { color: #fff !important; }
+        }
+
+        &.active,
+        &.mat-expanded {
+            color: #fff !important;
+            background: linear-gradient(135deg, #8b7cf6, #6353da) !important;
+            box-shadow: 0 8px 18px rgba(76,61,186,.3);
+            i-feather { color: #fff !important; }
+            &::after {
+                content: '';
+                position: absolute;
+                top: 12px;
+                right: 9px;
+                width: 4px;
+                height: 20px;
+                border-radius: 999px;
+                background: rgba(255,255,255,.72);
+            }
+        }
+    }
+
+    .sidebar-menu-link:last-child {
+        margin-top: 18px !important;
+        color: #ffadb9 !important;
+        background: rgba(231,84,108,.08);
+        &:hover { color: #fff !important; background: rgba(231,84,108,.72) !important; }
+    }
+
+    .mat-expansion-panel {
+        color: #c6cee0 !important;
+        .mat-expansion-indicator::before { color: #8490aa !important; }
+        .sidebar-sub-menu .sidemenu-link {
+            color: #c6cee0 !important;
+            &:hover, &.active { color: #fff !important; background: rgba(255,255,255,.07) !important; }
+        }
+    }
+}
+
+@media (min-width: 1200px) {
+    ::ng-deep .sidebar-area.active,
+    ::ng-deep .sidebar-area.hide-sidebar {
+        .sidebar-inner { padding-left: 11px !important; padding-right: 11px !important; }
+        .sidebar-menu-link, .mat-expansion-panel-header { min-height: 38px !important; padding: 0 !important; border-radius: 10px !important; }
+        .sidebar-menu-link i-feather, .mat-expansion-panel-header i-feather { left: 9px !important; }
+        &:hover {
+            .sidebar-inner { padding-left: 14px !important; padding-right: 14px !important; }
+            .sidebar-menu-link, .mat-expansion-panel-header { min-height: 44px !important; padding: 0 14px 0 44px !important; }
+            .sidebar-menu-link i-feather, .mat-expansion-panel-header i-feather { left: 15px !important; }
+        }
+    }
+}

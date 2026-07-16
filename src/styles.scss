@@ -54,15 +54,15 @@ $trinta-theme: mat.define-theme((
 :root {
     --fontFamily: "Poppins", sans-serif;
     --headingFontFamily: "Inter", sans-serif;
-    --primaryColor: #3761ee;
-    --dangerColor: #EE368C;
-    --infoColor: #2DB6F5;
-    --warningColor: #ffb264;
-    --successColor: #2ed47e;
-    --darkColor: #262626;
-    --blackColor: #5b5b98;
+    --primaryColor: #6c5ce7;
+    --dangerColor: #e7546c;
+    --infoColor: #3a86ff;
+    --warningColor: #f2a65a;
+    --successColor: #16a085;
+    --darkColor: #1f2a44;
+    --blackColor: #536078;
     --whiteColor: #ffffff;
-    --bodyColor: #a9a9c8;
+    --bodyColor: #7c879d;
     --transition: .5s;
     --fontSize: 14px;
 }
@@ -75,7 +75,7 @@ body {
     padding: 0;
     letter-spacing: 0.15px;
     color: var(--darkColor);
-    background-color: #f5f7fa;
+    background-color: #f4f6fb;
     font: {
         weight: 400;
         size: var(--fontSize);

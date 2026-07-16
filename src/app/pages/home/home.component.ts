@@ -114,7 +114,7 @@ export class HomeComponent {
                     this.dataSource.data = this.dashobardItem;
 
                     this.firstLoading = false;
-                    console.log("Dashboard updated");
+                    //console.log(this.dashobardItem);
 
                     this.get();
                 })
