@@ -325,3 +325,102 @@ h2[mat-dialog-title] {
 .breadcrumb{
     margin-bottom: 15px!important;
 }
+.page-header-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+    padding: 20px 22px;
+    border: 1px solid #edf0f6;
+    border-radius: 14px;
+    background: var(--whiteColor);
+    box-shadow: 0 7px 24px rgba(29, 38, 58, 0.055);
+    font-family: var(--fontFamily);
+
+    .page-eyebrow {
+        display: block;
+        color: var(--primaryColor);
+        font-family: var(--headingFontFamily);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    h1 {
+        margin: 5px 0 5px;
+        color: var(--darkColor);
+        font-family: var(--headingFontFamily);
+        font-size: 18px;
+        line-height: 1.35;
+    }
+
+    p {
+        margin: 0;
+        color: #7a7a8c;
+        font-family: var(--fontFamily);
+        font-size: 13px;
+        line-height: 1.55;
+    }
+}
+
+@media (max-width: 575px) {
+    .page-header-card {
+        padding: 17px 18px;
+    }
+}
+
+.page-actions {
+    min-height: 48px;
+    margin-bottom: 18px;
+}
+
+.page-section-title {
+    margin: 0 0 14px;
+    color: var(--darkColor);
+    font-family: var(--headingFontFamily);
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.page-header-card .header-action {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 10px !important;
+}
+
+.page-header-card .header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-top: 10px;
+}
+
+.page-header-card .header-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0 !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .page-header-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-header-card .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        margin-top: 4px;
+    }
+}

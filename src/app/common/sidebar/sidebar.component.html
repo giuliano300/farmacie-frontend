@@ -30,6 +30,12 @@
                             Dashboard
                         </span>
                     </a>
+                    <a routerLink="/batches" class="sidebar-menu-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                        <i-feather name="activity"></i-feather>
+                        <span class="title">
+                            Batch
+                        </span>
+                    </a>
 
                     <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = true">
                         <mat-expansion-panel-header>

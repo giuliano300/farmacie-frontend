@@ -12,6 +12,7 @@ import { CategoriesComponent } from './pages/customers/categories/categories.com
 import { HistoryComponent } from './pages/customers/history/history.component';
 import { FarmadatiComponent } from './pages/farmadati/farmadati.component';
 import { ProductToExcludeComponent } from './pages/customers/product-to-exclude/product-to-exclude.component';
+import { BatchesComponent } from './pages/batches/batches.component';
 
 export const routes: Routes = [
     { path: '', redirectTo : '/authentication', pathMatch: 'full' },
@@ -23,6 +24,7 @@ export const routes: Routes = [
         ]
     },
     {path: 'home', component: HomeComponent},
+    {path: 'batches', component: BatchesComponent},
     {path: 'customers/add', component: AddCustomerComponent},
     {path: 'customers/add/:id', component: AddCustomerComponent},
     {path: 'customers', component: CustomersComponent},

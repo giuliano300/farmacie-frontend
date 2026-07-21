@@ -1,509 +1,63 @@
-<nav aria-label="breadcrumb" class="position-relative">
-    <ol class="breadcrumb">
-        <li aria-current="page" class="breadcrumb-item active">Batch giornalieri in corso</li>
-    </ol>
-    <button class="btn-download btn btn-primary" (click)="start()"><i class="ri-add-line"></i> Avvia batch</button>
-</nav>
-<mat-card
-    class="trinta-card to-do-list-card mb-25 bg-white border-none d-block"
->
-    <mat-card-content>
-        <div class="to-do-list-table">
-            <div class="table-responsive">
-                <table mat-table [dataSource]="dataSource">
+<section class="dashboard-overview" aria-labelledby="dashboard-title">
+    <header class="dashboard-heading header-card">
+        <div><span class="eyebrow">Panoramica operativa</span><h1 id="dashboard-title">Dashboard</h1><p>Dati aggiornati automaticamente sui batch di oggi.</p></div>
+        <div class="live-status"><span></span> {{loading ? 'Caricamento' : 'Aggiornamento live'}}</div>
+    </header>
 
-                    <!-- Name Column -->
-                    <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Cliente
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Nome">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{element.customer.name}}<br>
-                                </h6>
-                                <h4>Durata import: {{getDurata(element)}} {{ticker && ''}}</h4>
-                            </div>
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="currentStep">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0">
-                            Step corrente
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Step corrente">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{element.status == 2 ? "Nessun step in corso" : getName(element.currentStep)}}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="stepStatus">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini2">
-                            Stato
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini2" data-label="Stato">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{element.status == 2 ? "Terminato" : getStatus(element.stepStatus)}}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="heronImport.progress">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Heron
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Heron">
-                             <div class="progress-container">
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.heronImport.progress"
-                                    [color]="getProgressClass(element.heronImport.progress)">
-                                </mat-progress-bar>
+    <div class="kpi-grid">
+        <button type="button" class="kpi-card kpi-blue" (click)="openCustomers()"><div class="kpi-icon"><i class="ri-store-2-line"></i></div><div><span>Clienti attivi</span><strong>{{activeCustomers}}</strong><small>{{customers.length}} configurati</small></div><i class="ri-arrow-right-up-line card-arrow"></i></button>
+        <button type="button" class="kpi-card kpi-violet" (click)="openBatches()"><div class="kpi-icon"><i class="ri-loader-4-line"></i></div><div><span>Batch in corso</span><strong>{{activeBatches.length}}</strong><small>apri gestione batch</small></div><i class="ri-arrow-right-up-line card-arrow"></i></button>
+        <button type="button" class="kpi-card kpi-green" (click)="openBatches()"><div class="kpi-icon"><i class="ri-checkbox-circle-line"></i></div><div><span>Completati oggi</span><strong>{{completedBatches.length}}</strong><small>{{successRate}}% senza errori</small></div><i class="ri-arrow-right-up-line card-arrow"></i></button>
+        <button type="button" class="kpi-card kpi-cyan" (click)="openBatches()"><div class="kpi-icon"><i class="ri-capsule-line"></i></div><div><span>Prodotti elaborati</span><strong>{{totalProductsToday | number:'1.0-0'}}</strong><small>vedi dettaglio batch</small></div><i class="ri-arrow-right-up-line card-arrow"></i></button>
+        <button type="button" class="kpi-card" [class.kpi-red]="errorsToday > 0" [class.kpi-green]="errorsToday === 0" (click)="openBatches()"><div class="kpi-icon"><i class="ri-error-warning-line"></i></div><div><span>Errori rilevati</span><strong>{{errorsToday}}</strong><small>apri dettaglio anomalie</small></div><i class="ri-arrow-right-up-line card-arrow"></i></button>
+    </div>
 
-                                <span class="progress-text">
-                                    {{element.heronImport.progress > 100 ? 100 : element.heronImport.progress}}%
-                                     <span class="restart" (click)="restart('HeronImport', element)" *ngIf="element.status != 2">- Avvia/Riavvia step</span>
-                                </span>
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="farmadati.progress">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Farmadati
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Farmadati">
-                             <div class="progress-container">
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.farmadati.progress"
-                                    [color]="getProgressClass(element.farmadati.progress)">
-                                </mat-progress-bar>
-
-                                <span class="progress-text">
-                                    {{element.farmadati.progress > 100 ? 100 : element.farmadati.progress}}%
-                                     <span class="restart" *ngIf="element.status != 2"
-                                        [class.disabled]="element.heronImport.progress < 100"
-                                        (click)="element.heronImport.progress === 100 && restart('Farmadati', element)">
-                                        - Avvia/Riavvia step
-                                    </span>
-                                </span>
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="suppliers.progress">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Fornitori
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Fornitori">
-                             <div class="progress-container">
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.suppliers.progress"
-                                    [color]="getProgressClass(element.suppliers.progress)">
-                                </mat-progress-bar>
-
-                                <span class="progress-text">
-                                    {{element.suppliers.progress > 100 ? 100 : element.suppliers.progress}}%
-                                     <span class="restart" *ngIf="element.status != 2"
-                                        [class.disabled]="element.farmadati.progress < 100"
-                                        (click)="element.farmadati.progress === 100 && restart('Suppliers', element)">
-                                        - Avvia/Riavvia step
-                                    </span>
-                                </span>
-                            </div>
-                        </td>
-                    </ng-container>
-
-
-                    <ng-container matColumnDef="magento.progress">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Magento
-                        </th>
-
-                        <td mat-cell *matCellDef="let element"
-                            class="pl-0 mini3 position-relative"
-                            data-label="Magento">
-
-                            <span class="spn-delete">
-                                <button
-                                    (click)="deleteBatch(element)"
-                                    class="btn delete"
-                                    matTooltip="elimina batch"
-                                    matTooltipPosition="above">
-                                    <i class="ri-close-large-line"></i>
-                                </button>
-                            </span>
-
-                            <!-- DOWNLOAD -->
-                            <div class="progress-container">
-
-                                <div class="progress-label">
-                                    Download prodotti
-                                </div>
-
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="getDownloadProgress(element)"
-                                    [color]="getProgressClass(getDownloadProgress(element))">
-                                </mat-progress-bar>
-
-                                <span class="progress-text">
-                                    {{ getDownloadProgress(element) > 100 ? 100 : getDownloadProgress(element) }}%
-                                </span>
-                            </div>
-
-                            <!-- INSERT PRODUCTS -->
-                            <div
-                                class="progress-container"
-                                *ngIf="showInsertProducts(element)">
-
-                                <div class="progress-label">
-                                    Inserimento prodotti
-                                </div>
-
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.magento.insertProducts.progress"
-                                    [color]="getProgressClass(element.magento.insertProducts.progress)">
-                                </mat-progress-bar>
-
-                                <span class="progress-text">
-                                    {{ element.magento.insertProducts.progress > 100 ? 100 : element.magento.insertProducts.progress }}%
-                                </span>
-                            </div>
-
-                            <!-- UPDATE PRODUCTS -->
-                            <div
-                                class="progress-container"
-                                *ngIf="showUpdateQty(element)">
-
-                                <div class="progress-label">
-                                    Aggiornamento giacenze
-                                </div>
-
-                                <mat-progress-bar
-                                    mode="determinate"
-                                    [value]="element.magento.updateProducts.progress"
-                                    [color]="getProgressClass(element.magento.updateProducts.progress)">
-                                </mat-progress-bar>
-
-                                <span class="progress-text">
-                                    {{ element.magento.updateProducts.progress > 100 ? 100 : element.magento.updateProducts.progress }}%
-                                </span>
-                            </div>
-
-                            <!-- INSERT IMAGES -->
-                            <div
-                                class="progress-container"
-                                *ngIf="showInsertImages(element)">
-
-                                <div class="progress-label">
-                                    Inserimento immagini
-                                    <br>
-
-                                    <small *ngIf="showWaitingInsertImages(element)">
-                                        Possono trascorrere alcuni minuti
-                                        <br>
-                                        prima dell'inizio dell'import
-                                    </small>
-                                </div>
-
-                                <!-- SPINNER finché non parte -->
-                                <div class="waiting-spinner" *ngIf="showWaitingInsertImages(element)">
-                                    <div class="loader"></div>
-                                    <span>Preparazione file per<br>inserimento immagini...</span>
-                                </div>
-
-                                <!-- PROGRESS BAR quando parte -->
-                                <ng-container *ngIf="!showWaitingInsertImages(element)">
-                                    <mat-progress-bar
-                                        mode="determinate"
-                                        [value]="getValueProgressImages(element.magento.insertImages.progress)"
-                                        [color]="getProgressClass(getValueProgressImages(element.magento.insertImages.progress))">
-                                    </mat-progress-bar>
-
-                                    <span class="progress-text">
-                                        {{ getValueProgressImages(element.magento.insertImages.progress) > 100 ? 100 : getValueProgressImages(element.magento.insertImages.progress) }}%
-                                    </span>
-                                </ng-container>
-
-                            </div>
-                            <!-- REINDEX -->
-                            <div class="progress-container">
-
-                                <span class="progress-text position-relative">
-
-                                    <span>
-
-                                        <div class="progress-label">
-                                            Completamento reindex
-                                        </div>
-
-                                        <mat-progress-bar
-                                            mode="determinate"
-                                            [value]="element.reindexValues.percent"
-                                            [color]="getProgressClass(+element.reindexValues.percent)">
-                                        </mat-progress-bar>
-
-                                        <span class="progress-text">
-                                            {{element.reindexValues.percent ?? 0}}%
-                                        </span>
-
-                                    </span>
-
-                                    <span class="hr"></span>
-
-                                    <span
-                                        class="update-force"
-                                        (click)="
-                                            restartMagento(
-                                                'update-force',
-                                                element
-                                            )
-                                        ">
-                                        Termina e aggiorna
-                                    </span>
-
-                                    <span
-                                        class="load"
-                                        *ngIf="isReindexRunning(element)">
-                                        <i
-                                            class="fa fa-spinner fa-spin">
-                                        </i>
-                                    </span>
-
-                                </span>
-
-                            </div>
-
-                        </td>
-                    </ng-container>
-
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-                    <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell text-center no-data" [attr.colspan]="displayedColumns.length">
-                            Nessun batch presente
-                        </td>
-                    </tr>
-
-                </table>
+    <div class="updates-grid">
+        <button type="button" class="update-card supplier-card" (click)="openSuppliers()">
+            <div class="update-card-heading">
+                <div class="update-icon"><i class="ri-truck-line"></i></div>
+                <div><span class="eyebrow">Aggiornamenti fornitori</span><h2>Copertura {{supplierUpdateCoverage}}%</h2></div>
+                <i class="ri-arrow-right-up-line update-arrow"></i>
             </div>
-        </div>
-        <div class="progress">
-            <mat-progress-bar *ngIf="firstLoading" mode="indeterminate"></mat-progress-bar>
-        </div>
-    </mat-card-content>
-</mat-card>
-
-<nav aria-label="breadcrumb" class="position-relative">
-    <ol class="breadcrumb">
-        <li aria-current="page" class="breadcrumb-item active">Batch giornalieri chiusi</li>
-    </ol>
-</nav>
-<mat-card class="trinta-card to-do-list-card mb-25 bg-white border-none d-block">
-    <mat-card-content>
-        <div class="to-do-list-table">
-            <div class="table-responsive">
-                <table mat-table [dataSource]="dataSourceT">
-
-                    <!-- Name Column -->
-                    <ng-container matColumnDef="Customer">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
-                            Cliente 
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Cliente">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{ element.batch.customer.name }}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="StartedAt">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini">
-                            Data inizio
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini" data-label="Data">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{ element.batch.startedAt | date:'dd/MM/yyyy HH:mm' }}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="currentStep">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Step 
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Step">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{ element.batch.currentStep }}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
-                    <ng-container matColumnDef="stepStatus">
-                        <th mat-header-cell *matHeaderCellDef class="pl-0 mini3">
-                            Completato 
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="pl-0 mini3" data-label="Stato">
-                            <div class="position-relative">
-                                <h6 class="mt-0 mb-0">
-                                    {{ element.batch.stepStatus < 2 ? 'Non completato' : 'completato' }}
-                                </h6>
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="magento">
-
-                        <th mat-header-cell *matHeaderCellDef class="pl-0">
-                            Importazione su magento
-                        </th>
-
-                        <td mat-cell *matCellDef="let element" class="pl-0" data-label="Magento">
-
-                            <div class="position-relative">
-
-                                <h6 class="mt-0 mb-0 lh-20">
-
-                                    Totale :
-                                    {{ !element.report ? 0 : element.report?.totalProducts }}
-                                    <br>
-
-                                    <!-- PRODOTTI -->
-                                    <span *ngIf="element.batch.type == 0 || element.batch.type == 1">
-
-                                        Importati/aggiornati :
-                                        {{ !element.report ? 0 : element.report?.insert }}
-                                        <br>
-
-                                    </span>
-
-                                    <!-- GIACENZE -->
-                                    <span *ngIf="element.batch.type == 2">
-
-                                        Aggiornamento giacenze :
-                                        {{ !element.report ? 0 : element.report?.updatePrice }}
-                                        <br>
-
-                                    </span>
-
-                                    <!-- IMMAGINI -->
-                                    <span *ngIf="element.batch.type == 3">
-
-                                        Inserimento immagini :
-                                        {{ !element.report ? 0 : element.report?.insertImages }}
-                                        <br>
-
-                                    </span>
-
-                                    Errori :
-                                    {{ !element.report ? 0 : element.report?.errors }}
-                                    <br>
-
-                                    <!-- STATO SOLO PRODOTTI -->
-                                    <span *ngIf="element.batch.type == 1">
-
-                                        Stato importazione :
-                                        {{
-                                            (
-                                                !element.report
-                                                ? 0
-                                                : element.report.insert / element.report.totalProducts * 100
-                                            ).toFixed(2)
-                                        }} %
-                                        <br>
-
-                                    </span>
-
-                                    <!-- STATO SOLO GIACENZE -->
-                                    <span *ngIf="element.batch.type == 2">
-
-                                        Stato aggiornamento :
-                                        {{
-                                            (
-                                                !element.report
-                                                ? 0
-                                                : element.report.updatePrice / element.report.totalProducts * 100
-                                            ).toFixed(2)
-                                        }} %
-                                        <br>
-
-                                    </span>
-
-                                    <!-- STATO SOLO IMMAGINI -->
-                                    <span *ngIf="element.batch.type == 3">
-
-                                        Stato import immagini :
-                                        {{
-                                            (
-                                                !element.report
-                                                ? 0
-                                                : element.report.insertImages / element.report.totalProducts * 100
-                                            ).toFixed(2)
-                                        }} %
-                                        <br>
-
-                                    </span>
-
-                                    <!-- COMPLETO -->
-                                    <span *ngIf="element.batch.type == 0">
-
-                                        Stato import prodotti :
-                                        {{
-                                            (
-                                                !element.report
-                                                ? 0
-                                                : element.report.insert / element.report.totalProducts * 100
-                                            ).toFixed(2)
-                                        }} %
-                                        <br>
-                                    </span>
-
-                                </h6>
-
-                            </div>
-
-                        </td>
-
-                    </ng-container>
-
-                    <ng-container matColumnDef="action">
-                        <th mat-header-cell *matHeaderCellDef class="text-center pr-0 mini3">
-                            Azioni
-                        </th>
-                        <td mat-cell *matCellDef="let element" class="text-center pr-0 mini3" data-label="Azioni">
-                            <div class="action">
-                                <button type="button" mat-button class="p-0 min-w-auto lh-1 h-auto" matTooltip="elimina" matTooltipPosition="above" (click)="DeleteItem(element)">
-                                    <i class="{{element.action.delete}}"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumnsT"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumnsT;"></tr>
-
-                    <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell text-center no-data" [attr.colspan]="displayedColumnsT.length">
-                            Nessun batch ancora chiuso oggi
-                        </td>
-                    </tr>
-
-                </table>
+            <div class="mini-stats">
+                <div><strong>{{activeSuppliers}}</strong><span>Attivi</span></div>
+                <div><strong>{{suppliersUpdatedToday}}</strong><span>Aggiornati oggi</span></div>
+                <div [class.has-warning]="suppliersWithoutUpdates > 0"><strong>{{suppliersWithoutUpdates}}</strong><span>Mai aggiornati</span></div>
             </div>
-        </div>
-         <div class="progress">
-            <mat-progress-bar *ngIf="firstLoadingClose" mode="indeterminate"></mat-progress-bar>
-        </div>
-    </mat-card-content>
-</mat-card>
+            <div class="update-track"><span [style.width.%]="supplierUpdateCoverage"></span></div>
+        </button>
+
+        <button type="button" class="update-card farmadati-card" (click)="openFarmadati()">
+            <div class="update-card-heading">
+                <div class="update-icon"><i class="ri-database-2-line"></i></div>
+                <div><span class="eyebrow">Aggiornamento Farmadati</span><h2>{{farmadatiRunning > 0 ? 'Elaborazione in corso' : 'Stato aggiornamenti'}}</h2></div>
+                <i class="ri-arrow-right-up-line update-arrow"></i>
+            </div>
+            <div class="mini-stats">
+                <div><strong>{{farmadatiRunning}}</strong><span>In corso</span></div>
+                <div><strong>{{farmadatiCompletedToday}}</strong><span>Completati oggi</span></div>
+                <div><strong>{{farmadatiProductsToday | number:'1.0-0'}}</strong><span>Prodotti lavorati</span></div>
+            </div>
+            <div class="update-track"><span [style.width.%]="latestFarmadatiProgress"></span></div>
+            <small class="progress-caption">Ultimo aggiornamento: {{latestFarmadatiProgress}}%</small>
+        </button>
+    </div>
+
+    <div class="insight-grid">
+        <button type="button" class="health-card" (click)="openBatches()">
+            <div class="panel-title"><div><span class="eyebrow">Affidabilità giornaliera</span><h2>Stato sincronizzazioni</h2></div><strong class="health-score">{{successRate}}%</strong></div>
+            <div class="health-track"><span [style.width.%]="successRate"></span></div>
+            <div class="health-legend"><span><i class="dot success"></i>{{completedBatches.length}} completati</span><span><i class="dot running"></i>{{activeBatches.length}} in corso</span><span><i class="dot error"></i>{{failedClosedBatches.length + problematicActiveBatches.length}} con anomalie</span></div>
+        </button>
+
+        <article class="attention-card">
+            <div class="panel-title"><div><span class="eyebrow">Centro anomalie</span><h2>Richiede attenzione</h2></div><span class="attention-count">{{attentionCount}}</span></div>
+            <div class="attention-list" *ngIf="attentionCount > 0; else allGood">
+                <button type="button" *ngFor="let item of problematicActiveBatches" (click)="openBatches()"><i class="ri-error-warning-fill critical"></i><span><strong>{{customerName(item)}}</strong><small>{{getBatchErrors(item)}} errori nel batch in corso</small></span><i class="ri-arrow-right-s-line arrow"></i></button>
+                <button type="button" *ngFor="let item of failedClosedBatches" (click)="openBatches()"><i class="ri-close-circle-fill critical"></i><span><strong>{{customerName(item.batch)}}</strong><small>{{item.report?.errors}} errori nel batch concluso</small></span><i class="ri-arrow-right-s-line arrow"></i></button>
+                <button type="button" *ngFor="let item of inactiveCustomers" (click)="openCustomers()"><i class="ri-pause-circle-fill warning"></i><span><strong>{{item.customer.name}}</strong><small>Cliente non attivo</small></span><i class="ri-arrow-right-s-line arrow"></i></button>
+            </div>
+            <ng-template #allGood><div class="all-good"><i class="ri-shield-check-line"></i><span><strong>Nessuna anomalia</strong><small>Tutti i sistemi risultano operativi.</small></span></div></ng-template>
+        </article>
+    </div>
+</section>

@@ -1,9 +1,6 @@
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li aria-current="page" class="breadcrumb-item active">{{title}}</li>
-  </ol>
-</nav>
-
+<header class="page-header-card">
+  <div><span class="page-eyebrow">Configurazione cliente</span><h1>{{title}}</h1><p>Inserisci i dati anagrafici e configura le integrazioni necessarie alla sincronizzazione.</p></div>
+</header>
 <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
   <mat-card class="trinta-card mb-10 bg-white border-none d-block">
     <mat-card-content>

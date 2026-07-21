@@ -1,581 +1,188 @@
-import { Component, DestroyRef, ViewChild } from '@angular/core';
-import { DashboardService } from '../../services/dashboard.service';
-import { Router } from '@angular/router';
-import { BatchDashboardItem, DashboardResponse } from '../../interfaces/Dashboard';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { StepService } from '../../services/step.service';
-import { runStepRequest } from '../../interfaces/runStepRequest';
-import { MatDialog } from '@angular/material/dialog';
-import { MagentoService } from '../../services/magento.service';
-import { BatchesService } from '../../services/batches.service';
-import { MatTooltip } from '@angular/material/tooltip';
-import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { Component, DestroyRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin, interval, switchMap } from 'rxjs';
+import { BatchesService } from '../../services/batches.service';
+import { CustomersService } from '../../services/customers.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { CompleteBatchesItem } from '../../interfaces/CompleteBatchesItem';
-import { AddBatchDialogComponent } from '../../add-batch-dialog/add-batch-dialog.component';
-
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
-import {
-    Subject,
-    filter,
-    interval,
-    switchMap,
-    timer,
-    takeUntil,
-    tap,
-    EMPTY
-} from 'rxjs';
+import { BatchDashboardItem } from '../../interfaces/Dashboard';
+import { customerWithBatchStatus } from '../../interfaces/customerWithBatchStatus';
+import { SuppliersService } from '../../services/suppliers.service';
+import { FarmadatiUpdatesService } from '../../services/farmadati-updates.service';
+import { suppliers } from '../../interfaces/supplier';
+import { FarmadatiUpdates } from '../../interfaces/Farmadati-updates';
 
 @Component({
     selector: 'app-home',
-    imports: [
-    MatButtonModule, 
-    MatSlideToggleModule, 
-    MatMenuModule, 
-    MatPaginatorModule, 
-    MatTableModule, 
-    MatCheckboxModule, 
-    MatFormFieldModule, 
-    CommonModule,
-    MatProgressBarModule,
-    MatCardModule,
-    MatTooltip,
-    MatProgressSpinnerModule
-],
+    imports: [CommonModule],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
 })
 export class HomeComponent {
+    activeBatches: BatchDashboardItem[] = [];
+    completedBatches: CompleteBatchesItem[] = [];
+    customers: customerWithBatchStatus[] = [];
+    suppliers: suppliers[] = [];
+    farmadatiUpdates: FarmadatiUpdates[] = [];
+    loading = true;
 
-    constructor(private dashboardService: DashboardService, 
+    constructor(
+        private dashboardService: DashboardService,
         private batchesService: BatchesService,
-        private router: Router, 
-        private stepService: StepService,      
-        private dialog: MatDialog,
-        private magentoService: MagentoService,
+        private customersService: CustomersService,
+        private suppliersService: SuppliersService,
+        private farmadatiUpdatesService: FarmadatiUpdatesService,
+        private router: Router,
         private destroyRef: DestroyRef
     ) {}
-    dashobardItem: BatchDashboardItem[] = [];
-    batch: CompleteBatchesItem[] = []; 
-    displayedColumns: string[] = ['name', 'currentStep', 'stepStatus', 'heronImport.progress','farmadati.progress','suppliers.progress','magento.progress'];
-    displayedColumnsT: string[] = ['Customer', 'StartedAt', 'currentStep', 'stepStatus', 'magento', 'action'];
-    dataSource = new MatTableDataSource<BatchDashboardItem>(this.dashobardItem);
-    dataSourceT = new MatTableDataSource<CompleteBatchesItem>(this.batch);
 
-    firstLoading: boolean = true;
-    earlyClosing: boolean = false;
-    firstLoadingClose: boolean = false;
-    steps = ['HeronImport', 'Farmadati', 'Suppliers', 'Magento'];
+    ngOnInit(): void {
+        this.customersService.getCustomers()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(data => this.customers = data);
 
-    reindexMap: Record<string, any> = {};
+        interval(3000).pipe(
+            switchMap(() => forkJoin({
+                dashboard: this.dashboardService.getDashboard(),
+                completed: this.batchesService.today(),
+                suppliers: this.suppliersService.getSuppliers(),
+                farmadati: this.farmadatiUpdatesService.get()
+            })),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(data => {
+            this.activeBatches = data.dashboard.activeBatches;
+            this.completedBatches = data.completed;
+            this.suppliers = data.suppliers;
+            this.farmadatiUpdates = this.sortFarmadati(data.farmadati);
+            this.loading = false;
+        });
 
-    ticker = 0;
+        this.refresh();
+    }
 
-    @ViewChild(MatPaginator) paginator!: MatPaginator
-
-    private stopLoad$ = new Subject<void>();
-
-    ngOnInit() {
-       this.firstLoading = true;
-       this.getLoad();
-       interval(1000)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(() => {
-            this.ticker++;
+    refresh(): void {
+        forkJoin({
+            dashboard: this.dashboardService.getDashboard(),
+            completed: this.batchesService.today(),
+            suppliers: this.suppliersService.getSuppliers(),
+            farmadati: this.farmadatiUpdatesService.get()
+        }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
+            this.activeBatches = data.dashboard.activeBatches;
+            this.completedBatches = data.completed;
+            this.suppliers = data.suppliers;
+            this.farmadatiUpdates = this.sortFarmadati(data.farmadati);
+            this.loading = false;
         });
     }
 
-    getLoad() {
-
-        timer(0, 3000) // ogni 3 secondi
-            .pipe(
-                takeUntil(this.stopLoad$),
-                takeUntilDestroyed(this.destroyRef),
-
-                filter(() => document.visibilityState === 'visible'),
-
-                switchMap(() =>
-                    this.dashboardService.getDashboard()
-                ),
-
-                tap(x => {
-                    this.dashobardItem = x.activeBatches;
-
-                    this.dataSource.data = this.dashobardItem;
-
-                    this.firstLoading = false;
-                    //console.log(this.dashobardItem);
-
-                    this.get();
-                })
-            )
-            .subscribe();
+    private sortFarmadati(updates: FarmadatiUpdates[]): FarmadatiUpdates[] {
+        return [...updates].sort((a, b) => new Date(b.startedAt ?? 0).getTime() - new Date(a.startedAt ?? 0).getTime());
     }
 
-
-    getProgressClass(percent: number): string {
-        if (percent < 30) {
-            return 'progress-red';
-        }
-
-        if (percent < 60) {
-            return 'progress-yellow';
-        }
-
-        if (percent < 90) {
-            return 'progress-orange';
-        }
-
-        if (percent < 100) {
-            return 'progress-gold';
-        }
-
-        return 'progress-green';
+    get activeCustomers(): number {
+        return this.customers.filter(item => item.customer.active).length;
     }
 
-    deleteBatch(b: any){
-        const data = 
-        {
-            title: "Vuoi eliminare questo batch?",
-            description:"Dopo l'eliminazione tutti i dati verrano cancellati irreversibilmente.",
-            btnDeleteText: "Elimina batch",
-            chiudi: "Annulla"
-        }
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-              width: '500px',
-              data:data
-        });
-    
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.firstLoading = true;
-                this.batchesService.delete(b.batchId!).subscribe(()=>{
-                    this.getLoad();
-                });  
-            } 
-            else 
-            {
-                console.log("Close");
-            }
-        });
+    get totalProductsToday(): number {
+        return this.completedBatches.reduce((total, item) => total + (item.report?.totalProducts ?? 0), 0);
     }
 
-    checkAndCall(element: any): boolean {
-
-        const result =
-
-            (
-                element.magento.progressInsert >= 100 &&
-                (element.type == 0 || element.type == 1)
-            )
-
-            ||
-
-            (
-                element.magento.progressUpdatePrice >= 100 &&
-                element.type == 2
-            )
-
-            ||
-
-            (
-                element.magento.progressInsertImages >= 100 &&
-                (element.type == 0 || element.type == 3)
-            )
-
-            ||
-
-            this.earlyClosing;
-
-        if (result && !this.reindexMap[element.batchId]?.started) {
-
-            this.stopLoad$.next();
-
-            this.reindexMap[element.batchId] = {
-                started: true,
-                percent: 0,
-                running: false,
-                processed: 0,
-                total: 0
-            };
-
-            setInterval(() => {
-                this.getReindexStatus(element.batchId);
-            }, 2000);
-        }
-
-        return result;
+    get errorsToday(): number {
+        return this.completedBatches.reduce((total, item) => total + (item.report?.errors ?? 0), 0) +
+            this.activeBatches.reduce((total, item) => total + this.getBatchErrors(item), 0);
     }
 
-    getReindexStatus(batchId: string) {
-
-        this.dashboardService
-            .getReindexStatus(batchId)
-            .subscribe((reindexStatus) => {
-
-                this.reindexMap[batchId] = {
-
-                    ...this.reindexMap[batchId],
-
-                    ...reindexStatus
-                };
-
-                if(reindexStatus.percent == 100)
-                {
-                    this.getLoad();
-                }
-            });
-    }
-    
-    restartMagento(currentStep: string, row: any){
-
-        if(currentStep === "Magento-insert")
-        {
-            this.magentoService.massiveImport(row.batchId).subscribe(()=>{
-                this.getLoad();
-            });
-        }
-
-        if(currentStep === "Magento-update-price")
-        {
-            this.magentoService.updateStockBulk(row.batchId).subscribe(()=>{
-                this.getLoad();
-            });
-        }
-
-        if(currentStep === "update-force")
-        {
-            const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-                width: '500px',
-                data: 
-                { 
-                    title: "Chiusura batch", 
-                    description:"Stai terminando anticipatamente il batch. Tutte le operazioni di import saranno concluse.",
-                    btnDeleteText: "Termina batch",
-                    chiudi: "Annulla"
-                }
-            });
-
-            dialogRef.afterClosed().subscribe((result: any) => {
-
-                if (result) {
-
-                    this.earlyClosing = true;
-
-                    this.magentoService.finalizeBatchAsync(row.batchId).subscribe(()=>{
-
-                        this.getLoad();
-
-                        this.earlyClosing = false;
-                    });
-                }
-            });
-        }
-    }
-    
-    restart(currentStep: string, row: any){
-        const req:runStepRequest = {
-            batchId: row.batchId,
-            step: currentStep ?? "HeronImport"
-        };
-        this.stepService.retry(req).subscribe((res)=>{
-            this.getLoad();
-        });
+    get successRate(): number {
+        const reported = this.completedBatches.filter(item => item.report);
+        if (!reported.length) return 100;
+        return Math.round(reported.filter(item => (item.report?.errors ?? 0) === 0).length / reported.length * 100);
     }
 
-    getStatus(status:number){
-        switch(status){
-            case 0: 
-                return 'in attesa';
-            case 1:
-                return 'in corso';
-            case 2:
-                return 'terminato';
-            case 3:
-                return 'in errore';
-            default:
-                return 'pending';
-        }
+    get inactiveCustomers(): customerWithBatchStatus[] {
+        return this.customers.filter(item => !item.customer.active);
     }
 
-    getName(stepName: string){
-        switch(stepName){
-            case "HeronImport": 
-                return "Import file heron";
-            case "Farmadati": 
-                return "Arricchimento da farmadati";
-            case "Suppliers": 
-                return "Sincro con prezzi fornitori";
-            case "Magento": 
-                return "Upload su store Magento";
-            default:
-                return "Step sconosciuto";
-        }
+    get problematicActiveBatches(): BatchDashboardItem[] {
+        return this.activeBatches.filter(item => this.getBatchErrors(item) > 0);
     }
 
-    getDurata(element: BatchDashboardItem){
-        const diff = Date.now() - new Date(element.startedAt).getTime();
-
-        const sec = Math.floor(diff / 1000) % 60;
-        const min = Math.floor(diff / 60000) % 60;
-        const hour = Math.floor(diff / 3600000);
-
-        return `${hour}h ${min}m ${sec}s`;
+    get failedClosedBatches(): CompleteBatchesItem[] {
+        return this.completedBatches.filter(item => (item.report?.errors ?? 0) > 0);
     }
 
-    get(){
-        this.batchesService.today().subscribe((data: CompleteBatchesItem[]) => {
-            this.batch = data.map(b => ({
-                ...b, 
-                values: '',
-                action: {
-                    update: 'ri-pencil-line',
-                    delete: 'ri-delete-bin-line'
-                }
-            }));
-
-            //console.log(JSON.stringify(this.batch));
-            this.dataSourceT = new MatTableDataSource<CompleteBatchesItem>(this.batch);
-            this.dataSourceT.paginator = this.paginator;
-            this.firstLoadingClose = false;
-        });
-    }
-    
-
-    start(){
-
-        const dialogRef = this.dialog.open(
-            AddBatchDialogComponent,
-            {
-                width: '600px',
-                minWidth:'auto'
-            });
-
-        dialogRef.afterClosed().subscribe((result: any) => {
-
-            if (result)
-            {
-                this.firstLoading = true;
-
-                this.batchesService
-                    .create(result.customerId, result.type)
-                    .subscribe((data: any) => {
-
-                        if(data.batchId){
-
-                            const req: runStepRequest = {
-
-                                batchId: data.batchId,
-                                step: "HeronImport",
-                                type: Number(result.type)
-                            };
-
-                            /*
-                                TYPE:
-
-                                0 = Completo
-                                1 = ImportProdotti
-                                2 = UpdatePrezzi
-                                3 = ImportImmagini
-                            */
-
-                            if(result.type == 0)
-                            {
-                                this.stepService
-                                    .retry(req)
-                                    .subscribe(() => {
-
-                                        this.getLoad();
-
-                                        this.firstLoading = false;
-                                    });
-                            }
-                            else
-                            {
-                                this.stepService
-                                    .retryByType(req)
-                                    .subscribe(() => {
-
-                                        this.getLoad();
-
-                                        this.firstLoading = false;
-                                    });
-                            }
-                        }
-                    });
-            }
-            else
-            {
-                console.log("Close");
-            }
-        });
+    get attentionCount(): number {
+        return this.inactiveCustomers.length + this.problematicActiveBatches.length + this.failedClosedBatches.length;
     }
 
-    DeleteItem(item:CompleteBatchesItem){
-
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            width: '500px'
-        });
-
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) 
-            {
-                this.firstLoadingClose = true;
-                this.batchesService.delete(item.batch.batchId!).subscribe(()=>{
-                    this.get();
-                });
-            } 
-            else 
-            {
-            console.log("Close");
-            }
-        });
+    get activeSuppliers(): number {
+        return this.suppliers.filter(item => item.active).length;
     }
 
-
-    canStartInsertProducts(batch: BatchDashboardItem): boolean {
-        return (
-            this.getDownloadProgress(batch) === 100 &&
-            batch.magento.insertProducts.status !== 1
-        );
+    get suppliersUpdatedToday(): number {
+        return this.suppliers.filter(item => item.lastUpdate && this.isToday(item.lastUpdate)).length;
     }
 
-    canStartUpdateProducts(batch: BatchDashboardItem): boolean {
-        return (
-            this.getDownloadProgress(batch) === 100 &&
-            batch.magento.updateProducts.status !== 1
-        );
+    get suppliersWithoutUpdates(): number {
+        return this.suppliers.filter(item => item.active && !item.lastUpdate).length;
     }
 
-    canStartInsertImages(batch: BatchDashboardItem): boolean {
-        return (
-            batch.magento.insertProducts.status === 2 &&
-            batch.magento.insertImages.status !== 1
-        );
+    get supplierUpdateCoverage(): number {
+        if (!this.activeSuppliers) return 100;
+        return Math.round(this.suppliers.filter(item => item.active && item.lastUpdate).length / this.activeSuppliers * 100);
     }
 
-    canFinalize(batch: BatchDashboardItem): boolean {
-
-        // solo import prodotti
-        if (batch.type === 1) {
-            return (
-                batch.magento.insertProducts.status === 2
-                || batch.magento.insertProducts.total === 0
-            );
-        }
-
-        // solo update giacenze
-        if (batch.type === 2) {
-            return (
-                batch.magento.updateProducts.status === 2
-                || batch.magento.updateProducts.total === 0
-            );
-        }
-
-        // solo immagini
-        if (batch.type === 3) {
-            return (
-                batch.magento.insertImages.status === 2
-                || batch.magento.insertImages.total === 0
-            );
-        }
-
-        // completo
-        return (
-            (
-                batch.magento.insertProducts.status === 2 ||
-                batch.magento.insertProducts.total === 0
-            )
-            &&
-            (
-                batch.magento.insertImages.status === 2 ||
-                batch.magento.insertImages.total === 0
-            )
-        ) || this.earlyClosing;
-    }        
-
-
-    hasMagentoStarted(batch: BatchDashboardItem): boolean {
-        return (
-            batch.magento.insertProducts.status > 0 ||
-            batch.magento.updateProducts.status > 0 ||
-            batch.magento.insertImages.status > 0 ||
-            batch.magento.totalMagentoProducts > 0
-        );
+    get farmadatiRunning(): number {
+        return this.farmadatiUpdates.filter(item => item.startedAt && !item.endedAt).length;
     }
 
-    getDownloadProgress(batch: BatchDashboardItem): number {
-        const total =
-            batch.magento.totalMagentoProducts ?? 0;
-
-        const downloaded =
-            batch.magento.downloadedMagentoProducts ?? 0;
-
-        // se Magento non è ancora partito
-        if (!this.hasMagentoStarted(batch)) {
-            return 0;
-        }
-
-        // 0/0 ma step partito => 100
-        if (total === 0 && downloaded === 0) {
-            return 100;
-        }
-
-        if (total === 0) {
-            return 0;
-        }
-
-        return Number(
-            ((downloaded / total) * 100).toFixed(2)
-        );
+    get farmadatiCompletedToday(): number {
+        return this.farmadatiUpdates.filter(item => item.endedAt && this.isToday(item.endedAt)).length;
     }
 
-    isReindexRunning(element: BatchDashboardItem): boolean {
-        return element.reindexValues.percent > 99 ? true : false;
+    get farmadatiProductsToday(): number {
+        return this.farmadatiUpdates
+            .filter(item => item.startedAt && this.isToday(item.startedAt))
+            .reduce((total, item) => total + (item.productWorked ?? 0), 0);
     }
 
-
-    showInsertProducts(batch: BatchDashboardItem): boolean {
-        return batch.type === 0 || batch.type === 1;
+    get latestFarmadatiProgress(): number {
+        const latest = this.farmadatiUpdates[0];
+        if (!latest?.productNumber) return 0;
+        return Math.min(100, Math.round((latest.productWorked ?? 0) / latest.productNumber * 100));
     }
 
-    showUpdateQty(batch: BatchDashboardItem): boolean {
-        return batch.type === 2;
+    private isToday(value: string | Date): boolean {
+        const date = new Date(value);
+        const today = new Date();
+        return date.getFullYear() === today.getFullYear() &&
+            date.getMonth() === today.getMonth() && date.getDate() === today.getDate();
     }
 
-    showInsertImages(batch: BatchDashboardItem): boolean {
-        return batch.type === 3;
+    getBatchErrors(batch: BatchDashboardItem): number {
+        return (batch.heronImport?.errors ?? 0) + (batch.farmadati?.errors ?? 0) +
+            (batch.suppliers?.errors ?? 0) + (batch.magento?.insertProducts?.errors ?? 0) +
+            (batch.magento?.updateProducts?.errors ?? 0) + (batch.magento?.insertImages?.errors ?? 0);
     }
 
-    getValueProgressImages(percent: number): number {
-
-        if (percent > 95) {
-            return 100;
-        }
-
-        return percent;
+    customerName(item: any): string {
+        return item?.customer?.name ?? 'Cliente';
     }
 
+    openBatches(): void {
+        this.router.navigate(['/batches']);
+    }
 
-    showWaitingInsertImages(element: any): boolean {
-        const downloadCompleted =
-            this.getDownloadProgress(element) === 100;
+    openCustomers(): void {
+        this.router.navigate(['/customers']);
+    }
 
-        const progress =
-            element?.batch?.type === 0
-                ? (element?.magento?.insertProducts?.progress ?? 0)
-                : (element?.magento?.insertImages?.progress ?? 0);
+    openSuppliers(): void {
+        this.router.navigate(['/suppliers']);
+    }
 
-        return downloadCompleted && progress === 0;
+    openFarmadati(): void {
+        this.router.navigate(['/farmadati']);
     }
 }

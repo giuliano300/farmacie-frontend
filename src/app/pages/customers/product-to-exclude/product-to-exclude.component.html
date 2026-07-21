@@ -1,13 +1,23 @@
-<nav aria-label="breadcrumb" class="position-relative">
-    <ol class="breadcrumb">
-        <li aria-current="page" class="breadcrumb-item active" (click)="back()">Prodotti da escludere del cliente {{customer?.customer?.name}}</li>
-    </ol>
-    <button class="btn-download btn btn-primary" (click)="addProducts()"><i class="ri-add-line"></i> Aggiungi prodotti</button>
-</nav>
+<header class="page-header-card">
+    <div><span class="page-eyebrow">Regole di esclusione</span><h1>Prodotti da escludere<span *ngIf="customer?.customer?.name"> — {{customer?.customer?.name}}</span></h1><p>Gestisci i prodotti esclusi dalla sincronizzazione di {{customer?.customer?.name || 'questo cliente'}}.</p></div>
+    <div class="header-actions"><button class="btn btn-primary" (click)="addProducts()"><i class="ri-add-line"></i> Aggiungi prodotti</button></div>
+</header>
 <mat-card
     class="trinta-card to-do-list-card mb-25 bg-white border-none d-block"
 >
     <mat-card-content>
+        <div class="search-box position-relative">
+            <input
+                type="search"
+                class="d-block w-100 border-none outline-0"
+                placeholder="Cerca per nome o AIC"
+                aria-label="Cerca prodotto per nome o AIC"
+                (input)="applyFilter($event)"
+            >
+            <button type="button" class="p-0 bg-transparent border-none" aria-label="Cerca">
+                <i class="ri-search-line"></i>
+            </button>
+        </div>
         <div class="to-do-list-table">
             <div class="table-responsive">
                 <table mat-table [dataSource]="dataSource">

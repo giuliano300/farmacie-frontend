@@ -1,13 +1,10 @@
-<nav aria-label="breadcrumb" class="position-relative">
-    <ol class="breadcrumb">
-        <li aria-current="page" class="breadcrumb-item active" (click)="back()">Categorie del cliente {{customer?.customer?.name}}</li>
-    </ol>
-    <button class="btn-download-before btn btn-secondary" (click)="update()">Aggiorna categorie</button>
-    <span class="hover-spin" *ngIf="isUpdating">
-        <i class="fa fa-spinner fa-spin"></i>
-    </span>
-    <button class="btn-download btn btn-primary" (click)="addCategory()"><i class="ri-add-line"></i> Aggiungi mapping</button>
-</nav>
+<header class="page-header-card">
+    <div><span class="page-eyebrow">Mapping catalogo</span><h1>Categorie<span *ngIf="customer?.customer?.name"> — {{customer?.customer?.name}}</span></h1><p>Gestisci le associazioni tra le categorie gestionali e il catalogo di {{customer?.customer?.name || 'questo cliente'}}.</p></div>
+    <div class="header-actions">
+        <button class="btn btn-secondary" (click)="update()"><i *ngIf="isUpdating" class="fa fa-spinner fa-spin"></i> Aggiorna categorie</button>
+        <button class="btn btn-primary" (click)="addCategory()"><i class="ri-add-line"></i> Aggiungi mapping</button>
+    </div>
+</header>
 <mat-card
     class="trinta-card to-do-list-card mb-25 bg-white border-none d-block"
 >

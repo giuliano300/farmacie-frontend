@@ -36,6 +36,7 @@ export class ProductToExcludeComponent {
     customer: customerWithBatchStatus | undefined;
     firstLoading: boolean = true;
     isUpdating: boolean = false;
+    searchTerm: string = '';
 
     constructor(private dialog: MatDialog, 
       private productService: ProductToExcludeService, 
@@ -48,8 +49,9 @@ export class ProductToExcludeComponent {
 
     // Search Filter
     applyFilter(event: Event) {
-        const filterValue = (event.target as HTMLInputElement).value;
-        this.dataSource.filter = filterValue.trim().toLowerCase();
+        this.searchTerm = (event.target as HTMLInputElement).value.trim().toLowerCase();
+        this.dataSource.filter = this.searchTerm;
+        this.dataSource.paginator?.firstPage();
     }
 
     ngOnInit(): void {
@@ -80,7 +82,11 @@ export class ProductToExcludeComponent {
 
             //console.log(JSON.stringify(this.categories));
             this.dataSource = new MatTableDataSource<ProductToExclude>(this.product);
+            this.dataSource.filterPredicate = (product, filter) =>
+                product.productName.toLowerCase().includes(filter) ||
+                product.aic.toLowerCase().includes(filter);
             this.dataSource.paginator = this.paginator;
+            this.dataSource.filter = this.searchTerm;
             this.firstLoading = false;
         });
       });
